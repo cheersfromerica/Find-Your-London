@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find Your London</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    /* Ericatoon Design System — tokens/colors.css, typography.css, spacing.css */
+    --cream-0:#fefdfb; --cream-100:#f6f0e6; --butter-100:#f9f5db;
+    --green-100:#cfe1b9; --green-200:#b5c99a; --green-300:#97a97c; --green-400:#87986a; --green-500:#6f8760; --green-900:#44523d;
+    --clay-200:#d99a8a; --clay-300:#d2886a; --clay-400:#c98d72; --clay-500:#d87348;
+    --taupe-300:#b9aa97;
+
+    --surface-page:var(--cream-100); --surface-card:var(--cream-0); --surface-tint:var(--butter-100); --surface-mint:var(--green-100);
+    --text-body:var(--green-900); --text-muted:var(--green-400); --text-faint:var(--taupe-300);
+    --text-on-accent:var(--cream-0); --text-on-clay:var(--cream-0);
+    --accent:var(--green-500); --accent-hover:var(--green-900); --accent-soft:var(--green-200);
+    --highlight:var(--clay-500); --highlight-soft:var(--clay-200);
+    --border:rgba(68,82,61,.16); --border-strong:rgba(68,82,61,.32);
+    --focus-ring:0 0 0 3px rgba(111,135,96,.35);
+
+    --font-display:'Jua', ui-rounded, sans-serif;
+    --font-body:'Gowun Dodum', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --text-xs:12px; --text-sm:14px; --text-md:16px; --text-lg:20px; --text-xl:26px; --text-2xl:34px; --text-3xl:46px;
+    --leading-tight:1.2; --leading-body:1.65; --track-display:-0.01em;
+
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px; --sp-8:64px;
+    --radius-sm:8px; --radius-md:12px; --radius-lg:20px; --radius-xl:28px; --radius-pill:999px;
+    --shadow-sm:0 1px 2px rgba(68,82,61,.08);
+    --shadow-md:0 4px 12px rgba(68,82,61,.10);
+  }
+  /* single warm paper theme by design — Ericatoon has no dark variant, so this page commits to one look */
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--surface-page);
+    color:var(--text-body);
+    font-family:var(--font-body);
+    font-size:var(--text-md);
+    line-height:var(--leading-body);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  h1,h2,h3{
+    font-family:var(--font-display);
+    font-weight:400;
+    letter-spacing:var(--track-display);
+    margin:0;
+    text-wrap:balance;
+  }
+
+  .mono{ font-family:var(--font-mono); letter-spacing:0.02em; }
+  .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); }
+
+  button{ font-family:inherit; cursor:pointer; }
+  :focus-visible{ outline:none; box-shadow:var(--focus-ring); border-radius:var(--radius-sm); }
+
+  .lang-toggle{
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:20;
+    background:var(--surface-card);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    font-family:var(--font-mono);
+    font-size:0.74rem;
+    letter-spacing:0.04em;
+    padding:7px 14px;
+    border-radius:var(--radius-pill);
+    box-shadow:var(--shadow-sm);
+    transition:border-color 150ms ease, color 150ms ease;
+  }
+  .lang-toggle:hover{ border-color:var(--accent); color:var(--accent-hover); }
+
+  #app{ min-height:100vh; display:flex; flex-direction:column; }
+  .view{ flex:1; width:100%; }
+  .view[hidden]{ display:none; }
+
+  .shell{ max-width:720px; margin:0 auto; padding:0 var(--sp-5) var(--sp-8); width:100%; }
+
+  /* ---------- intro ---------- */
+  #view-intro .shell{
+    display:flex;
+    flex-direction:column;
+    gap:var(--sp-6);
+    padding-top:clamp(64px, 10vw, 96px);
+  }
+  .line-preview{
+    position:relative;
+    height:3px;
+    background:var(--border);
+    border-radius:var(--radius-pill);
+    margin:2px 0;
+  }
+  .line-preview .dot{
+    position:absolute;
+    top:50%;
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--accent);
+    transform:translate(-50%,-50%);
+  }
+  #view-intro h1{
+    font-size:clamp(2rem, 5.5vw, 3.1rem);
+    line-height:var(--leading-tight);
+  }
+  #view-intro h1 em{ font-style:normal; color:var(--highlight); }
+  .intro-copy{
+    max-width:min(68ch, 100%);
+    color:var(--text-muted);
+    font-size:var(--text-md);
+    line-height:var(--leading-body);
+    word-break:keep-all;
+    overflow-wrap:normal;
+  }
+  .intro-meta{ display:flex; gap:18px; flex-wrap:wrap; color:var(--text-faint); }
+  .intro-meta span{ font-size:0.78rem; }
+  .btn-primary{
+    align-self:flex-start;
+    background:var(--accent);
+    color:var(--text-on-accent);
+    border:none;
+    padding:14px 30px;
+    font-size:var(--text-md);
+    font-family:var(--font-body);
+    font-weight:500;
+    border-radius:var(--radius-pill);
+    box-shadow:var(--shadow-sm);
+    transition:background 150ms ease, transform 120ms ease;
+  }
+  .btn-primary:hover{ background:var(--accent-hover); }
+  .btn-primary:active{ transform:scale(.98); }
+
+  .area-grid-head{ margin-top:var(--sp-2); }
+  .area-grid-head .eyebrow{ margin-bottom:var(--sp-3); }
+  .area-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(104px, 1fr));
+    gap:var(--sp-3);
+  }
+  .area-tile{
+    background:var(--surface-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:var(--sp-2);
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow 150ms ease, transform 150ms ease;
+  }
+  .area-tile:hover{ box-shadow:var(--shadow-md); transform:translateY(-2px); }
+  .area-tile canvas{ width:100%; aspect-ratio:4/3; display:block; border-radius:var(--radius-sm); }
+  .area-tile span{ font-family:var(--font-mono); font-size:11px; text-align:center; color:var(--text-body); letter-spacing:0.01em; }
+
+  /* ---------- quiz ---------- */
+  #view-quiz .shell{
+    display:flex;
+    flex-direction:column;
+    gap:var(--sp-6);
+    padding-top:clamp(56px, 9vw, 88px);
+  }
+  .progress{ display:flex; flex-direction:column; gap:10px; }
+  .progress-top{ display:flex; justify-content:space-between; align-items:baseline; }
+  .progress-track{ position:relative; height:4px; background:var(--border); border-radius:var(--radius-pill); }
+  .progress-fill{
+    position:absolute; left:0; top:0;
+    height:4px;
+    background:var(--accent);
+    border-radius:var(--radius-pill);
+    width:0%;
+    transition:width 260ms ease;
+  }
+  .progress-stations{ position:relative; top:-5px; display:flex; justify-content:space-between; }
+  .station{
+    width:12px; height:12px;
+    border-radius:50%;
+    background:var(--surface-card);
+    border:2px solid var(--border);
+    transition:border-color 200ms ease, background 200ms ease, transform 150ms ease;
+  }
+  .station.done{ background:var(--accent); border-color:var(--accent); }
+  .station.current{ border-color:var(--highlight); transform:scale(1.2); }
+
+  .question h2{ font-size:clamp(1.4rem, 3.6vw, 1.9rem); line-height:var(--leading-tight); font-weight:600; }
+
+  .options{ display:flex; flex-direction:column; gap:var(--sp-3); }
+  .option{
+    display:flex;
+    align-items:center;
+    gap:var(--sp-3);
+    width:100%;
+    background:var(--surface-card);
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:var(--sp-4);
+    text-align:left;
+    color:var(--text-body);
+    font-family:var(--font-body);
+    font-size:var(--text-md);
+    transition:border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+  }
+  .option:hover{ border-color:var(--accent-soft); box-shadow:var(--shadow-sm); }
+  .option.selected{ border-color:var(--accent); background:var(--surface-mint); }
+  .option .letter{
+    font-family:var(--font-mono);
+    font-size:0.76rem;
+    color:var(--text-muted);
+    flex:0 0 auto;
+    width:26px; height:26px;
+    border-radius:50%;
+    background:var(--surface-tint);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .option.selected .letter{ background:var(--accent); color:var(--text-on-accent); }
+
+  .quiz-foot{ display:flex; justify-content:space-between; align-items:center; }
+  .link-back{
+    background:none;
+    border:1.5px solid transparent;
+    padding:8px 16px;
+    color:var(--text-muted);
+    font-family:var(--font-body);
+    font-size:0.88rem;
+    border-radius:var(--radius-pill);
+    transition:background 150ms ease, color 150ms ease;
+  }
+  .link-back:hover:not(:disabled){ background:var(--surface-tint); color:var(--text-body); }
+  .link-back:disabled{ opacity:0; pointer-events:none; }
+
+  /* ---------- result ---------- */
+  #view-result .shell{ max-width:880px; padding-top:clamp(48px, 8vw, 72px); }
+  .poster{
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow-md);
+  }
+  @media (max-width:640px){ .poster{ grid-template-columns:1fr; } }
+  .poster-copy{
+    padding:var(--sp-6);
+    display:flex;
+    flex-direction:column;
+    gap:var(--sp-4);
+    background:var(--poster-wash, var(--surface-card));
+    color:var(--text-body);
+  }
+  .poster-tags{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.03em;
+    padding:5px 12px;
+    border-radius:var(--radius-pill);
+    border:1px solid var(--poster-rule, var(--border-strong));
+    background:var(--surface-card);
+  }
+  .poster-copy h1{
+    font-size:clamp(2rem, 4.6vw, 2.8rem);
+    font-style:normal;
+    color:var(--highlight);
+    line-height:1.1;
+  }
+  .poster-badges{ display:flex; gap:var(--sp-4); flex-wrap:wrap; }
+  .badge{ font-family:var(--font-mono); font-size:0.76rem; color:var(--text-body); }
+  .badge b{
+    display:block;
+    font-size:0.64rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    font-weight:400;
+  }
+  .poster-desc{ font-size:0.98rem; max-width:40ch; font-family:var(--font-body); }
+  .poster-desc .hashtags{
+    display:block;
+    margin-top:10px;
+    font-family:var(--font-mono);
+    font-size:0.76rem;
+    color:var(--text-muted);
+    letter-spacing:0.01em;
+  }
+  .poster-canvas-wrap{
+    position:relative;
+    min-height:260px;
+    background:var(--poster-canvas-bg, var(--surface-tint));
+  }
+  .poster-canvas-wrap canvas{ width:100%; height:100%; display:block; }
+  .result-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:var(--sp-5);
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .btn-secondary{
+    background:none;
+    border:1.5px solid var(--accent);
+    color:var(--accent);
+    padding:10px 22px;
+    border-radius:var(--radius-pill);
+    font-family:var(--font-body);
+    font-size:0.9rem;
+    transition:background 150ms ease;
+  }
+  .btn-secondary:hover{ background:var(--surface-tint); }
+  .result-note{ color:var(--text-muted); font-size:0.8rem; max-width:36ch; }
+  .result-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .btn-save{
+    background:var(--highlight);
+    color:var(--text-on-clay);
+    border:none;
+    padding:10px 22px;
+    border-radius:var(--radius-pill);
+    font-family:var(--font-body);
+    font-size:0.9rem;
+    box-shadow:var(--shadow-sm);
+    transition:opacity 150ms ease, transform 120ms ease;
+  }
+  .btn-save:hover{ opacity:0.9; }
+  .btn-save:active{ transform:scale(.98); }
+  .btn-save:disabled{ opacity:0.5; cursor:default; }
+  .save-status{
+    width:100%;
+    margin-top:2px;
+    font-size:0.74rem;
+    color:var(--text-muted);
+    min-height:1.1em;
+    text-align:right;
+  }
+
+  .site-footer{
+    text-align:center;
+    padding:var(--sp-5) var(--sp-5) var(--sp-6);
+    font-family:var(--font-mono), monospace;
+    font-size:0.72rem;
+    letter-spacing:0.02em;
+    color:var(--text-faint, #b9aa97);
+  }
+  .site-footer a{
+    color:inherit;
+    text-decoration:underline;
+    text-decoration-color:var(--border-strong, rgba(68,82,61,.32));
+  }
+  .site-footer a:hover{ color:var(--accent-hover, #44523d); }
+</style>
+
+
+</head>
+<body>
+<button class="lang-toggle mono" id="lang-toggle" type="button"></button>
+
+<div id="app">
+
+  <section id="view-intro" class="view">
+    <div class="shell">
+      <div class="eyebrow" id="intro-eyebrow"></div>
+      <h1 id="intro-h1"></h1>
+      <p class="intro-copy" id="intro-copy"></p>
+      <div class="line-preview" id="intro-line"></div>
+      <div class="intro-meta mono">
+        <span id="meta-q"></span>
+        <span>&middot;</span>
+        <span id="meta-o"></span>
+        <span>&middot;</span>
+        <span id="meta-t"></span>
+      </div>
+      <button class="btn-primary" id="start-btn"></button>
+
+      <div class="area-grid-head">
+        <div class="eyebrow" id="area-grid-label"></div>
+      </div>
+      <div class="area-grid" id="area-grid"></div>
+    </div>
+  </section>
+
+  <section id="view-quiz" class="view" hidden>
+    <div class="shell">
+      <div class="progress">
+        <div class="progress-top">
+          <span class="eyebrow" id="q-counter">Question 1 of 10</span>
+          <span class="eyebrow" id="q-dim">&nbsp;</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-stations" id="progress-stations"></div>
+      </div>
+      <div class="question">
+        <h2 id="q-text"></h2>
+      </div>
+      <div class="options" id="q-options"></div>
+      <div class="quiz-foot">
+        <button class="link-back" id="back-btn"></button>
+        <span></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-result" class="view" hidden>
+    <div class="shell">
+      <div class="poster" id="poster">
+        <div class="poster-copy" id="poster-copy">
+          <div class="eyebrow" id="r-eyebrow"></div>
+          <h1 id="r-name"></h1>
+          <div class="poster-badges" id="r-badges"></div>
+          <div class="poster-tags" id="r-tags"></div>
+          <p class="poster-desc" id="r-desc"></p>
+        </div>
+        <div class="poster-canvas-wrap">
+          <canvas id="r-canvas"></canvas>
+        </div>
+      </div>
+      <div class="result-foot">
+        <p class="result-note" id="result-note"></p>
+        <div class="result-actions">
+          <button class="btn-save" id="save-btn" type="button"></button>
+          <button class="btn-secondary" id="retake-btn"></button>
+        </div>
+        <p class="save-status mono" id="save-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="site-footer">&copy; 2026 &middot; <a href="https://instagram.com/cheers.from.erica" target="_blank" rel="noopener noreferrer">@cheers.from.erica</a></footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var DIMS = ["energy","community","afford","green","culture","family","connectivity","riverside"];
+
+  // ---------- UI strings ----------
+  var STRINGS = {
+    en: {
+      htmlLang:"en",
+      introEyebrow:"A ten-stop quiz · twelve neighbourhoods",
+      introH1:"Find the part of <em>London</em><br>that actually suits you.",
+      introCopy:"Ten questions about vibe, budget, commute and community —<br>matched against twelve of London's most lived-in neighbourhoods,<br>from Canary Wharf to Dulwich.<br>No postcode small talk, just your answers.",
+      metaQ:"10 questions", metaO:"12 outcomes", metaT:"~3 min",
+      startBtn:"Start the quiz",
+      areaGridLabel:"The twelve neighbourhoods you could match with",
+      backBtn:"← Back",
+      questionCounter:function(i,total){ return "Question " + i + " of " + total; },
+      yourMatch:"Your match",
+      zoneLabel:"Zone",
+      lineLabel:function(plural){ return plural ? "Nearest lines" : "Nearest line"; },
+      resultNote:"Matched from your answers across energy, community, budget, green space, culture, family fit, commute and riverside character.",
+      retakeBtn:"Retake the quiz",
+      saveBtn:"Save as JPG",
+      saveBtnBusy:"Saving…",
+      saveError:"Couldn't save the image — try again.",
+      saveUnavailable:"Image saving isn't available in this view.",
+      langToggle:"한국어"
+    },
+    ko: {
+      htmlLang:"ko",
+      introEyebrow:"10문항 퀴즈 · 런던 12개 동네",
+      introH1:"나에게 맞는<br><em>런던</em> 동네 찾기",
+      introCopy:"분위기, 예산, 통근, 커뮤니티에 관한 열 가지 질문으로<br>Canary Wharf부터 Dulwich까지,<br>런던에서 가장 많이 선택되는 열두 개 동네 중 당신에게 맞는 곳을 찾아드립니다.<br>우편번호는 몰라도 괜찮아요 — 솔직한 답변이면 충분합니다.",
+      metaQ:"질문 10개", metaO:"결과 12종", metaT:"약 3분",
+      startBtn:"퀴즈 시작하기",
+      areaGridLabel:"매칭될 수 있는 12개 동네",
+      backBtn:"← 이전",
+      questionCounter:function(i,total){ return "질문 " + i + " / " + total; },
+      yourMatch:"당신의 매칭 결과",
+      zoneLabel:"Zone",
+      lineLabel:function(plural){ return "가까운 노선"; },
+      resultNote:"에너지, 커뮤니티, 예산, 공원, 문화, 가족 친화도, 통근, 리버사이드 매력까지 — 당신의 답변을 바탕으로 매칭했습니다.",
+      retakeBtn:"다시 하기",
+      saveBtn:"JPG로 저장",
+      saveBtnBusy:"저장 중…",
+      saveError:"이미지를 저장하지 못했어요 — 다시 시도해 주세요.",
+      saveUnavailable:"이 화면에서는 이미지 저장을 사용할 수 없어요.",
+      langToggle:"English"
+    }
+  };
+
+  var QUESTIONS = [
+    { tag:{en:"Energy", ko:"에너지"}, text:{en:"What kind of energy do you want where you live?", ko:"어떤 에너지를 가진 동네에서 살고 싶으신가요?"}, options:[
+      { label:{en:"Buzzing and lively — something's always on", ko:"활기차고 생동감 있게 — 늘 무언가 일어나는 곳"}, delta:{energy:3, culture:2} },
+      { label:{en:"Easygoing and social — you know your neighbours", ko:"편안하고 사교적으로 — 이웃과도 친하게 지내는 곳"}, delta:{community:2, energy:1} },
+      { label:{en:"Calm and quiet — peaceful streets", ko:"차분하고 조용하게 — 평화로운 거리"}, delta:{energy:-3, green:1} }
+    ]},
+    { tag:{en:"Priority", ko:"우선순위"}, text:{en:"What matters most when picking where to live?", ko:"살 곳을 고를 때 가장 중요한 것은 무엇인가요?"}, options:[
+      { label:{en:"A strong sense of community", ko:"끈끈한 커뮤니티"}, delta:{community:3} },
+      { label:{en:"Space and privacy, a proper residential feel", ko:"여유로운 공간과 프라이버시, 제대로 된 주거 느낌"}, delta:{family:2, green:1} },
+      { label:{en:"Being close to everything — shops, culture, nightlife", ko:"모든 것과 가까운 곳 — 상점, 문화, 나이트라이프"}, delta:{culture:2, connectivity:1} }
+    ]},
+    { tag:{en:"Weekend", ko:"주말"}, text:{en:"Your ideal weekend looks like:", ko:"당신의 이상적인 주말은?"}, options:[
+      { label:{en:"A street market, a gallery, a new café", ko:"거리 마켓, 갤러리, 새로운 카페 탐방"}, delta:{culture:3} },
+      { label:{en:"A long walk in a park or along the river", ko:"공원이나 강변을 따라 오래 걷기"}, delta:{green:2, riverside:2} },
+      { label:{en:"Catching up with the whole street at the local", ko:"동네 펍에서 이웃들과 함께 어울리기"}, delta:{community:3} }
+    ]},
+    { tag:{en:"Commute", ko:"통근"}, text:{en:"How do you feel about the commute?", ko:"통근에 대해 어떻게 생각하시나요?"}, options:[
+      { label:{en:"Door-to-desk under 30 minutes, non-negotiable", ko:"문 앞에서 책상까지 30분 이내, 양보 불가"}, delta:{connectivity:3} },
+      { label:{en:"I'll trade commute time for a nicer home", ko:"더 좋은 집을 위해서라면 통근 시간은 포기할 수 있어요"}, delta:{connectivity:-2, family:1, green:1} },
+      { label:{en:"Somewhere in between is fine", ko:"그 중간 정도면 괜찮아요"}, delta:{connectivity:1} }
+    ]},
+    { tag:{en:"Budget", ko:"예산"}, text:{en:"Which is closest to your budget reality?", ko:"당신의 예산 현실에 가장 가까운 것은?"}, options:[
+      { label:{en:"I want the most space for my money", ko:"같은 돈이면 최대한 넓은 공간을 원해요"}, delta:{afford:3} },
+      { label:{en:"I'll pay a premium to be in the right spot", ko:"딱 맞는 위치라면 프리미엄도 지불할 수 있어요"}, delta:{afford:-3, connectivity:1} },
+      { label:{en:"Comfortably in the middle", ko:"무리 없는 중간 정도"}, delta:{afford:1} }
+    ]},
+    { tag:{en:"Housing", ko:"주거 형태"}, text:{en:"Which home can you picture yourself in?", ko:"어떤 집에서 사는 모습이 그려지시나요?"}, options:[
+      { label:{en:"A period terrace on a classic street", ko:"클래식한 거리의 유서 깊은 테라스 하우스"}, delta:{family:1, community:2} },
+      { label:{en:"A modern flat, ideally by the water", ko:"가능하면 강변에 있는 모던한 플랫"}, delta:{riverside:2, connectivity:1} },
+      { label:{en:"A suburban house with a garden", ko:"정원이 있는 교외 주택"}, delta:{green:2, family:2} }
+    ]},
+    { tag:{en:"Nightlife", ko:"나이트라이프"}, text:{en:"How close do you want nightlife and good food?", ko:"나이트라이프와 맛집이 얼마나 가까웠으면 하시나요?"}, options:[
+      { label:{en:"On my doorstep, please", ko:"바로 집 앞에 있었으면 해요"}, delta:{culture:2, energy:2} },
+      { label:{en:"Happy to travel into town for a big night", ko:"특별한 밤엔 시내까지 나가는 것도 괜찮아요"}, delta:{energy:-2} },
+      { label:{en:"A couple of good locals is all I need", ko:"괜찮은 동네 펍 한두 곳이면 충분해요"}, delta:{community:2} }
+    ]},
+    { tag:{en:"Household", ko:"가구 형태"}, text:{en:"Who is this home for?", ko:"누구를 위한 집인가요?"}, options:[
+      { label:{en:"Flying solo or with housemates, want to be central", ko:"혼자 또는 룸메이트와 함께, 중심가에 살고 싶어요"}, delta:{energy:2, connectivity:2} },
+      { label:{en:"Settling down or starting a family", ko:"정착하거나 가족을 꾸릴 준비가 됐어요"}, delta:{family:3, green:1} },
+      { label:{en:"A couple who wants social and calm", ko:"사교적이면서도 차분한 삶을 원하는 커플"}, delta:{community:2} }
+    ]},
+    { tag:{en:"Green space", ko:"공원"}, text:{en:"How important is green space?", ko:"공원은 얼마나 중요한가요?"}, options:[
+      { label:{en:"Essential — a park or common nearby is a must", ko:"필수예요 — 근처에 공원이나 커먼이 꼭 있어야 해요"}, delta:{green:3} },
+      { label:{en:"Nice to have, not essential", ko:"있으면 좋지만 꼭 필요한 건 아니에요"}, delta:{green:1} },
+      { label:{en:"Not fussed, I'd rather be near the action", ko:"크게 상관없어요, 차라리 번화한 곳에 가까운 게 좋아요"}, delta:{green:-2, energy:1} }
+    ]},
+    { tag:{en:"The scene", ko:"동네 풍경"}, text:{en:"Which scene appeals to you most?", ko:"가장 끌리는 풍경은 무엇인가요?"}, options:[
+      { label:{en:"Skyscrapers and river views", ko:"고층 빌딩과 강변 전망"}, delta:{riverside:2, connectivity:1, culture:1} },
+      { label:{en:"Independent shops, markets, creative studios", ko:"독립 상점, 마켓, 크리에이티브 스튜디오"}, delta:{culture:2, energy:1} },
+      { label:{en:"Tree-lined streets and village high-street charm", ko:"가로수길과 작은 마을 같은 번화가의 매력"}, delta:{community:2, green:1, family:1} }
+    ]}
+  ];
+
+  var AREAS = [
+    { name:"Canary Wharf", zone:"Zone 2", lines:["Jubilee line","DLR","Elizabeth line"],
+      tags:{en:["Skyline","Riverside","Business hub"], ko:["스카이라인","리버사이드","비즈니스 허브"]}, accent:"#7C8793", motif:"skyline",
+      profile:{energy:7,community:3,afford:2,green:4,culture:6,family:3,connectivity:9,riverside:9},
+      desc:{ body:{en:"Glass towers, river light, and a skyline that never really switches off. You live where London does business, with world-class food and transport on your doorstep.",
+                   ko:"유리 타워와 강변의 빛, 꺼지지 않는 스카이라인. 런던의 비즈니스 중심지에서 살며, 세계적 수준의 맛집과 교통을 문 앞에 두는 삶입니다."},
+             tags:"#skylineliving #workhardplayhard #riversideviews #alwaysconnected" } },
+
+    { name:"Shoreditch", zone:"Zone 1", lines:["Overground","Central line (Old St)"],
+      tags:{en:["Creative","Nightlife","Independent"], ko:["크리에이티브","나이트라이프","인디펜던트"]}, accent:"#C1572D", motif:"streetart",
+      profile:{energy:9,community:5,afford:3,green:2,culture:10,family:2,connectivity:8,riverside:3},
+      desc:{ body:{en:"Street art, warehouse bars, and a creative scene that starts after dark. This is London at its most unfiltered.",
+                   ko:"거리 예술과 창고를 개조한 바, 해가 지면 시작되는 크리에이티브 신. 가장 꾸밈없는 런던의 모습입니다."},
+             tags:"#creativecore #nightowl #independentshops #neverboring" } },
+
+    { name:"Clapham", zone:"Zone 2", lines:["Northern line"],
+      tags:{en:["Common life","Social","Young crowd"], ko:["커먼 라이프","소셜","젊은 동네"]}, accent:"#33322E", motif:"bandstand",
+      profile:{energy:8,community:7,afford:5,green:7,culture:6,family:5,connectivity:8,riverside:2},
+      desc:{ body:{en:"Common-side picnics by day, packed bars by night — Clapham is the classic young-London balance of green space and good times.",
+                   ko:"낮에는 커먼(공원)에서의 피크닉, 밤에는 북적이는 바 — Clapham은 공원과 즐거움의 균형을 보여주는 전형적인 젊은 런던입니다."},
+             tags:"#commonlife #socialbutton #easycommute #bestofbothworlds" } },
+
+    { name:"Hammersmith", zone:"Zone 2", lines:["District line","Piccadilly line"],
+      tags:{en:["Riverside","Commuter","Understated"], ko:["리버사이드","통근 요지","차분함"]}, accent:"#1F3A5F", motif:"bridge",
+      profile:{energy:6,community:5,afford:5,green:5,culture:5,family:5,connectivity:8,riverside:8},
+      desc:{ body:{en:"A working river town with a proper commuter backbone — towpath walks, theatre nights, and the City a short ride away.",
+                   ko:"탄탄한 통근 노선을 갖춘 강변 동네 — 강가 산책로, 극장가의 밤, 그리고 멀지 않은 City까지. 꾸밈없이 실속 있는 곳입니다."},
+             tags:"#riversidelife #wellconnected #understatedcharm #bridgeviews" } },
+
+    { name:"Wimbledon", zone:"Zone 3", lines:["District line","National Rail"],
+      tags:{en:["Village","Family-first","Leafy"], ko:["빌리지","가족 중심","녹음 가득"]}, accent:"#4B2E58", motif:"village",
+      profile:{energy:4,community:7,afford:3,green:9,culture:5,family:9,connectivity:6,riverside:2},
+      desc:{ body:{en:"A village high street, century-old courts, and leafy commons at every turn — Wimbledon is London's favourite small-town escape.",
+                   ko:"작은 마을 같은 번화가와 100년 역사의 코트, 곳곳의 푸른 커먼 — Wimbledon은 런던 사람들이 가장 사랑하는 소도시 같은 동네입니다."},
+             tags:"#villagelife #familyfirst #greenandquiet #classicsuburb" } },
+
+    { name:"Ealing", zone:"Zone 3", lines:["Central line","Elizabeth line","District line"],
+      tags:{en:["Suburb royalty","Family-friendly","Leafy"], ko:["교외의 여왕","가족 친화적","녹음 가득"]}, accent:"#7C7FAE", motif:"avenue",
+      profile:{energy:4,community:8,afford:6,green:8,culture:5,family:9,connectivity:7,riverside:2},
+      desc:{ body:{en:"Known as the Queen of the Suburbs for a reason: wide avenues, good schools, and a fast line into town.",
+                   ko:"'교외의 여왕'이라 불리는 데는 이유가 있습니다: 넓은 가로수길, 좋은 학교, 그리고 시내까지 빠르게 연결되는 노선까지."},
+             tags:"#suburbqueen #familyfriendly #treelineliving #stillconnected" } },
+
+    { name:"Richmond", zone:"Zone 4", lines:["District line","Overground","National Rail"],
+      tags:{en:["Royal park","Riverside","Quiet luxury"], ko:["로열 파크","리버사이드","조용한 럭셔리"]}, accent:"#2E4A2E", motif:"deerpark",
+      profile:{energy:3,community:7,afford:2,green:10,culture:6,family:8,connectivity:5,riverside:9},
+      desc:{ body:{en:"Deer in the park, the Thames at your feet, and some of the best green space in the capital. Quiet luxury, London-adjacent.",
+                   ko:"공원을 거니는 사슴, 발 아래 흐르는 템즈강, 그리고 런던 최고 수준의 공원. 도심과 가까운 조용한 럭셔리입니다."},
+             tags:"#parklife #riverside #quietluxury #natureonyourdoorstep" } },
+
+    { name:"Greenwich", zone:"Zone 2/3", lines:["DLR","Jubilee line (North Greenwich)"],
+      tags:{en:["Riverside","Heritage","Market town"], ko:["리버사이드","유서 깊은","마켓 타운"]}, accent:"#1E8A8C", motif:"observatory",
+      profile:{energy:5,community:6,afford:6,green:7,culture:8,family:6,connectivity:6,riverside:9},
+      desc:{ body:{en:"History, river views, and a market worth the walk — Greenwich mixes heritage with a genuine sense of place.",
+                   ko:"역사와 강변 전망, 그리고 일부러 걸어갈 만한 마켓까지 — Greenwich는 유산과 고유한 동네 정취를 함께 갖추고 있습니다."},
+             tags:"#riverhistory #markettown #parkandpalace #timelesslondon" } },
+
+    { name:"Islington", zone:"Zone 1/2", lines:["Northern line","Victoria line","Piccadilly line"],
+      tags:{en:["Georgian terraces","Upper Street","Central"], ko:["조지안 테라스","Upper Street","센트럴"]}, accent:"#5C2A3D", motif:"terrace",
+      profile:{energy:7,community:7,afford:3,green:4,culture:8,family:5,connectivity:9,riverside:2},
+      desc:{ body:{en:"Georgian terraces and Upper Street energy — Islington is for people who want culture and community on the same street.",
+                   ko:"조지안 양식의 테라스 하우스와 Upper Street의 활기 — Islington은 같은 거리에서 문화와 커뮤니티를 모두 원하는 사람들을 위한 곳입니다."},
+             tags:"#terracecharm #upperstreetlife #citycentral #stillhomely" } },
+
+    { name:"Notting Hill", zone:"Zone 1/2", lines:["Central line","Circle line","District line"],
+      tags:{en:["Boutique","Market mornings","Pastel streets"], ko:["부티크","마켓 아침","파스텔 거리"]}, accent:"#B8923A", motif:"pastelrow",
+      profile:{energy:6,community:6,afford:2,green:6,culture:8,family:5,connectivity:8,riverside:2},
+      desc:{ body:{en:"Pastel townhouses, Portobello markets, and a neighbourhood that photographs as good as it lives.",
+                   ko:"파스텔톤 타운하우스와 Portobello 마켓, 그리고 사진으로 봐도 실제로 살아도 아름다운 동네입니다."},
+             tags:"#pastelstreets #marketmornings #boutiqueliving #classicwest" } },
+
+    { name:"Brixton", zone:"Zone 2", lines:["Victoria line"],
+      tags:{en:["Community-first","Music","Market culture"], ko:["커뮤니티 중심","음악","마켓 문화"]}, accent:"#3F6FA8", motif:"market",
+      profile:{energy:9,community:9,afford:6,green:5,culture:9,family:4,connectivity:8,riverside:1},
+      desc:{ body:{en:"Music spilling out of every doorway and a market that never really closes — Brixton has more community energy per square mile than almost anywhere in London.",
+                   ko:"집집마다 흘러나오는 음악과 사실상 쉬지 않는 마켓 — Brixton은 런던 어느 곳보다도 평방마일당 커뮤니티 에너지가 넘치는 동네입니다."},
+             tags:"#communityfirst #musicinthestreets #marketculture #reallondon" } },
+
+    { name:"Dulwich", zone:"Zone 3", lines:["National Rail only — no tube"],
+      linesNote:{en:"National Rail only — no tube", ko:"내셔널 레일만 운행 — 튜브 없음"},
+      tags:{en:["Gallery","Woodland","Family haven"], ko:["갤러리","우드랜드","가족의 안식처"]}, accent:"#7A2E2E", motif:"gallery",
+      profile:{energy:3,community:7,afford:4,green:9,culture:6,family:9,connectivity:4,riverside:1},
+      desc:{ body:{en:"No tube, no rush — just galleries, woodland, and some of the best schools in the city. Dulwich is London in slow motion.",
+                   ko:"튜브도 없고 서두를 일도 없이 — 갤러리와 숲, 그리고 도시 최고 수준의 학교들만 있습니다. Dulwich는 슬로모션으로 흘러가는 런던입니다."},
+             tags:"#villagequiet #familyhaven #artandwoodland #slowerlondon" } }
+  ];
+
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  function dimRange(dim){
+    var min = 0, max = 0;
+    QUESTIONS.forEach(function(q){
+      var vals = q.options.map(function(o){ return o.delta[dim] || 0; });
+      min += Math.min.apply(Math, vals);
+      max += Math.max.apply(Math, vals);
+    });
+    return { min:min, max:max };
+  }
+
+  function computeResult(deltas){
+    var raw = {};
+    DIMS.forEach(function(d){ raw[d] = 0; });
+    deltas.forEach(function(delta){
+      DIMS.forEach(function(d){ raw[d] += delta[d] || 0; });
+    });
+    var norm = {};
+    DIMS.forEach(function(d){
+      var range = dimRange(d);
+      norm[d] = range.max > range.min ? clamp(((raw[d]-range.min)/(range.max-range.min))*10, 0, 10) : 5;
+    });
+    var scored = AREAS.map(function(area){
+      var dist = 0;
+      DIMS.forEach(function(d){ var diff = norm[d]-area.profile[d]; dist += diff*diff; });
+      return { area:area, dist:dist };
+    });
+    scored.sort(function(a,b){ return a.dist-b.dist; });
+    var close = scored.filter(function(s){ return s.dist <= scored[0].dist + 0.5; });
+    if (close.length > 1){
+      close.sort(function(a,b){
+        var subA = Math.pow(norm.energy-a.area.profile.energy,2) + Math.pow(norm.family-a.area.profile.family,2);
+        var subB = Math.pow(norm.energy-b.area.profile.energy,2) + Math.pow(norm.family-b.area.profile.family,2);
+        return subA-subB;
+      });
+      return close[0].area;
+    }
+    return scored[0].area;
+  }
+
+  // ---------- state ----------
+  var state = { qIndex:0, answers:[], lang:"ko" };
+  var lastArea = null;
+  var gridCanvases = [];
+
+  function t(){ return STRINGS[state.lang]; }
+
+  function showView(id){
+    document.querySelectorAll(".view").forEach(function(v){ v.hidden = v.id !== id; });
+  }
+
+  function zoneDisplay(zoneStr){
+    return zoneStr;
+  }
+
+  // ---------- intro ----------
+  function buildIntroLine(){
+    var track = document.getElementById("intro-line");
+    for (var i=0;i<10;i++){
+      var dot = document.createElement("div");
+      dot.className = "dot";
+      dot.style.left = (i/9*100) + "%";
+      track.appendChild(dot);
+    }
+  }
+
+  function renderIntroText(){
+    var s = t();
+    document.getElementById("intro-eyebrow").textContent = s.introEyebrow;
+    document.getElementById("intro-h1").innerHTML = s.introH1;
+    document.getElementById("intro-copy").innerHTML = s.introCopy;
+    document.getElementById("meta-q").textContent = s.metaQ;
+    document.getElementById("meta-o").textContent = s.metaO;
+    document.getElementById("meta-t").textContent = s.metaT;
+    document.getElementById("start-btn").textContent = s.startBtn;
+    document.getElementById("area-grid-label").textContent = s.areaGridLabel;
+  }
+
+  function buildAreaGrid(){
+    var wrap = document.getElementById("area-grid");
+    wrap.innerHTML = "";
+    gridCanvases = [];
+    AREAS.forEach(function(area){
+      var tile = document.createElement("div");
+      tile.className = "area-tile";
+      var canvas = document.createElement("canvas");
+      tile.appendChild(canvas);
+      var label = document.createElement("span");
+      label.textContent = area.name;
+      tile.appendChild(label);
+      wrap.appendChild(tile);
+      gridCanvases.push({ canvas:canvas, area:area });
+    });
+    gridCanvases.forEach(function(g){ drawMotifOnCanvas(g.canvas, g.area); });
+  }
+
+  // ---------- quiz ----------
+  function buildStations(){
+    var wrap = document.getElementById("progress-stations");
+    wrap.innerHTML = "";
+    for (var i=0;i<QUESTIONS.length;i++){
+      var s = document.createElement("div");
+      s.className = "station";
+      wrap.appendChild(s);
+    }
+  }
+
+  function renderQuiz(){
+    var lang = state.lang;
+    var q = QUESTIONS[state.qIndex];
+    document.getElementById("q-counter").textContent = t().questionCounter(state.qIndex+1, QUESTIONS.length);
+    document.getElementById("q-dim").textContent = q.tag[lang];
+    document.getElementById("q-text").textContent = q.text[lang];
+    document.getElementById("progress-fill").style.width = (state.qIndex / QUESTIONS.length * 100) + "%";
+
+    var stations = document.querySelectorAll("#progress-stations .station");
+    stations.forEach(function(st, i){
+      st.classList.toggle("done", i < state.qIndex || (i === state.qIndex && !!state.answers[i]));
+      st.classList.toggle("current", i === state.qIndex);
+    });
+
+    var optionsWrap = document.getElementById("q-options");
+    optionsWrap.innerHTML = "";
+    var selected = state.answers[state.qIndex];
+    q.options.forEach(function(opt, i){
+      var btn = document.createElement("button");
+      btn.className = "option" + (selected && selected.optionIndex === i ? " selected" : "");
+      btn.type = "button";
+      btn.innerHTML = '<span class="letter">' + String.fromCharCode(97+i) + '</span><span>' + opt.label[lang] + "</span>";
+      btn.addEventListener("click", function(idx, delta){
+        return function(){ selectOption(idx, delta); };
+      }(i, opt.delta));
+      optionsWrap.appendChild(btn);
+    });
+
+    document.getElementById("back-btn").textContent = t().backBtn;
+    document.getElementById("back-btn").disabled = state.qIndex === 0;
+  }
+
+  function selectOption(optionIndex, delta){
+    state.answers[state.qIndex] = { optionIndex:optionIndex, delta:delta };
+    renderQuiz();
+    window.setTimeout(function(){
+      if (state.qIndex < QUESTIONS.length-1){
+        state.qIndex += 1;
+        renderQuiz();
+      } else {
+        var deltas = state.answers.map(function(a){ return a.delta; });
+        var area = computeResult(deltas);
+        showView("view-result");
+        renderResult(area);
+      }
+    }, 320);
+  }
+
+  // ---------- result ----------
+  function hexToRgb(hex){
+    var h = hex.replace("#","");
+    var n = parseInt(h, 16);
+    return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+  }
+
+  function renderResult(area){
+    lastArea = area;
+    var lang = state.lang;
+    var rgb = hexToRgb(area.accent);
+    var wash = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.14)";
+    var washStrong = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.22)";
+    var ruleTint = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.45)";
+
+    var copyEl = document.getElementById("poster-copy");
+    copyEl.style.setProperty("--poster-wash", wash);
+    copyEl.style.setProperty("--poster-rule", ruleTint);
+    document.querySelector(".poster-canvas-wrap").style.setProperty("--poster-canvas-bg", washStrong);
+
+    var linesText = area.linesNote ? area.linesNote[lang] : area.lines.join(" · ");
+    var s = t();
+
+    document.getElementById("r-eyebrow").textContent = s.yourMatch;
+    document.getElementById("r-name").textContent = area.name;
+    document.getElementById("r-badges").innerHTML =
+      '<span class="badge"><b>' + s.zoneLabel + '</b>' + zoneDisplay(area.zone) + '</span>' +
+      '<span class="badge"><b>' + s.lineLabel(area.lines.length>1) + '</b>' + linesText + '</span>';
+    document.getElementById("r-tags").innerHTML = area.tags[lang].map(function(tg){ return '<span class="tag">'+tg+'</span>'; }).join("");
+    document.getElementById("r-desc").innerHTML = area.desc.body[lang] + '<span class="hashtags">' + area.desc.tags + '</span>';
+    document.getElementById("result-note").textContent = s.resultNote;
+    document.getElementById("retake-btn").textContent = s.retakeBtn;
+    document.getElementById("save-btn").textContent = s.saveBtn;
+    document.getElementById("save-status").textContent = "";
+
+    drawMotif(area);
+  }
+
+  function drawMotifOnCanvas(canvas, area){
+    var rect = canvas.getBoundingClientRect();
+    var w = rect.width || canvas.clientWidth || 1;
+    var h = rect.height || canvas.clientHeight || 1;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(w*dpr));
+    canvas.height = Math.max(1, Math.round(h*dpr));
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle = area.accent;
+    ctx.fillStyle = area.accent;
+    ctx.lineWidth = 1.6;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    var fn = MOTIFS[area.motif];
+    if (fn) fn(ctx, w, h);
+  }
+
+  function drawMotif(area){
+    drawMotifOnCanvas(document.getElementById("r-canvas"), area);
+  }
+
+  function ln(ctx,x1,y1,x2,y2){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }
+  function circ(ctx,x,y,r){ ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke(); }
+
+  var MOTIFS = {
+    skyline: function(ctx,w,h){
+      var base = h*0.78;
+      ctx.save(); ctx.globalAlpha = 0.5; ln(ctx,0,base,w,base); ctx.restore();
+      var towers = [[0.14,0.07,0.34],[0.25,0.09,0.5],[0.38,0.06,0.28],[0.48,0.1,0.58],[0.63,0.07,0.4],[0.75,0.08,0.46]];
+      towers.forEach(function(t){
+        var x=t[0]*w, tw=t[1]*w, th=t[2]*h;
+        ctx.strokeRect(x, base-th, tw, th);
+        ctx.save(); ctx.globalAlpha=0.22; ln(ctx, x+tw/2, base, x+tw/2, base+th*0.22); ctx.restore();
+      });
+    },
+    streetart: function(ctx,w,h){
+      ctx.save(); ctx.globalAlpha=0.45;
+      [[0.1,0.15,0.4,0.1,0.25,0.55],[0.5,0.1,0.85,0.2,0.6,0.5],[0.15,0.6,0.45,0.85,0.08,0.82]].forEach(function(p){
+        ctx.beginPath(); ctx.moveTo(p[0]*w,p[1]*h); ctx.lineTo(p[2]*w,p[3]*h); ctx.lineTo(p[4]*w,p[5]*h); ctx.closePath(); ctx.fill();
+      });
+      ctx.restore();
+      for (var r=0;r<3;r++) for (var c=0;c<3;c++) ctx.strokeRect(w*0.68+c*w*0.07, h*0.1+r*h*0.07, w*0.05, h*0.05);
+    },
+    bandstand: function(ctx,w,h){
+      var base=h*0.78, cx=w*0.5, cy=h*0.52, r=w*0.15;
+      ln(ctx,0,base,w,base);
+      ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,2*Math.PI); ctx.stroke();
+      ln(ctx,cx-r,cy,cx-r,base); ln(ctx,cx+r,cy,cx+r,base); ln(ctx,cx-r,cy,cx+r,cy);
+      var trees=[0.1,0.2,0.82,0.92];
+      trees.forEach(function(xf){
+        var x=xf*w, cry=base-h*0.14;
+        ctx.beginPath(); ctx.arc(x,cry,w*0.03,0,Math.PI*2); ctx.stroke();
+        ln(ctx,x,cry+w*0.03,x,base);
+      });
+    },
+    bridge: function(ctx,w,h){
+      var base=h*0.72, deck=h*0.58, cx=w*0.5, r=w*0.4;
+      ln(ctx,0,base,w,base);
+      ctx.beginPath(); ctx.arc(cx,base,r,Math.PI,2*Math.PI); ctx.stroke();
+      ln(ctx,cx-r,deck,cx+r,deck);
+      for (var i=-3;i<=3;i++){
+        var x=cx+i*r/4;
+        var dy=base-Math.sqrt(Math.max(r*r-Math.pow(x-cx,2),0));
+        ln(ctx,x,dy,x,deck);
+      }
+    },
+    village: function(ctx,w,h){
+      var base=h*0.78;
+      ln(ctx,0,base,w,base);
+      [0.12,0.4,0.68].forEach(function(xf){
+        var x=xf*w, bw=w*0.18, bh=h*0.22;
+        ctx.strokeRect(x,base-bh,bw,bh);
+        ctx.beginPath(); ctx.moveTo(x,base-bh); ctx.lineTo(x+bw/2,base-bh-h*0.12); ctx.lineTo(x+bw,base-bh); ctx.stroke();
+      });
+      var nx=w*0.72, ny=h*0.1, nw=w*0.22, nh=h*0.2;
+      ctx.strokeRect(nx,ny,nw,nh);
+      ln(ctx,nx+nw/2,ny,nx+nw/2,ny+nh); ln(ctx,nx,ny+nh/2,nx+nw,ny+nh/2);
+      ctx.beginPath(); ctx.arc(nx+nw*0.75,ny+nh*0.7,w*0.012,0,Math.PI*2); ctx.fill();
+    },
+    avenue: function(ctx,w,h){
+      var base=h*0.8, vp=[w*0.5,h*0.15];
+      ln(ctx,0,base,vp[0],vp[1]); ln(ctx,w,base,vp[0],vp[1]);
+      for (var i=0;i<6;i++){
+        var x=w*0.08+i*(w*0.84/5), cry=base-h*0.16;
+        ctx.beginPath(); ctx.arc(x,cry,w*0.028,0,Math.PI*2); ctx.stroke();
+        ln(ctx,x,cry+w*0.028,x,base);
+      }
+    },
+    deerpark: function(ctx,w,h){
+      var base=h*0.74;
+      for (var i=0;i<4;i++){ var x=i/3*w; ctx.beginPath(); ctx.moveTo(x,base); ctx.quadraticCurveTo(x+w*0.08,base-h*0.03,x+w*0.16,base); ctx.stroke(); }
+      [[0.25,0.4],[0.6,0.42]].forEach(function(p){
+        var x=p[0]*w, y=p[1]*h;
+        ln(ctx,x,y,x-w*0.03,y-h*0.08); ln(ctx,x,y,x+w*0.02,y-h*0.09); ln(ctx,x,y,x,y+h*0.1);
+      });
+      for (var j=0;j<5;j++) ln(ctx, j*w*0.06, h*0.12, j*w*0.06+w*0.03, h*0.08);
+    },
+    observatory: function(ctx,w,h){
+      var base=h*0.78;
+      ln(ctx,0,base,w,base);
+      ctx.beginPath(); ctx.moveTo(w*0.1,base); ctx.quadraticCurveTo(w*0.3,base-h*0.22,w*0.45,base-h*0.02); ctx.stroke();
+      ctx.beginPath(); ctx.arc(w*0.3,base-h*0.24,w*0.08,Math.PI,2*Math.PI); ctx.stroke();
+      var sx=w*0.68, sy=base-h*0.05;
+      ctx.strokeRect(sx,sy,w*0.2,h*0.06);
+      ln(ctx,sx+w*0.1,sy,sx+w*0.1,sy-h*0.18);
+      ctx.beginPath(); ctx.moveTo(sx+w*0.1,sy-h*0.18); ctx.lineTo(sx+w*0.18,sy-h*0.06); ctx.lineTo(sx+w*0.1,sy-h*0.06); ctx.closePath(); ctx.stroke();
+    },
+    terrace: function(ctx,w,h){
+      var base=h*0.82;
+      ln(ctx,0,base,w,base);
+      for (var i=0;i<4;i++){
+        var x=w*0.06+i*w*0.23, bw=w*0.18, bh=h*0.5;
+        ctx.strokeRect(x,base-bh,bw,bh);
+        ctx.beginPath(); ctx.moveTo(x-w*0.01,base-bh); ctx.lineTo(x+bw/2,base-bh-h*0.08); ctx.lineTo(x+bw+w*0.01,base-bh); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+bw/2,base-h*0.06,w*0.02,Math.PI,2*Math.PI); ctx.stroke();
+      }
+    },
+    pastelrow: function(ctx,w,h){
+      var base=h*0.82;
+      ln(ctx,0,base,w,base);
+      var hts=[0.42,0.5,0.46,0.38];
+      for (var i=0;i<4;i++){
+        var x=w*0.05+i*w*0.24, bw=w*0.2, bh=hts[i]*h;
+        ctx.strokeRect(x,base-bh,bw,bh);
+        ctx.strokeRect(x+bw*0.25,base-bh*0.7,bw*0.5,bh*0.3);
+        ctx.beginPath(); ctx.arc(x+bw/2,base-bh+h*0.02,w*0.018,0,Math.PI,true); ctx.stroke();
+      }
+    },
+    market: function(ctx,w,h){
+      var base=h*0.74;
+      ln(ctx,0,base,w,base);
+      for (var i=0;i<3;i++){
+        var x=w*0.1+i*w*0.3, tw=w*0.22, th=h*0.2;
+        ctx.beginPath(); ctx.moveTo(x,base-th*0.4); ctx.lineTo(x+tw/2,base-th); ctx.lineTo(x+tw,base-th*0.4); ctx.stroke();
+        ctx.strokeRect(x+tw*0.15,base-th*0.4,tw*0.7,th*0.4);
+      }
+      ctx.beginPath();
+      for (var sx=0; sx<=w; sx+=w*0.04){
+        var sy = base + h*0.08 + Math.sin(sx*0.05)*h*0.025;
+        if (sx===0) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);
+      }
+      ctx.stroke();
+    },
+    gallery: function(ctx,w,h){
+      var base=h*0.8;
+      ln(ctx,0,base,w,base);
+      var gx=w*0.08, gw=w*0.46, gh=h*0.3;
+      ctx.strokeRect(gx,base-gh,gw,gh);
+      ctx.beginPath(); ctx.moveTo(gx-w*0.02,base-gh); ctx.lineTo(gx+gw/2,base-gh-h*0.1); ctx.lineTo(gx+gw+w*0.02,base-gh); ctx.stroke();
+      for (var i=1;i<4;i++){ var cx=gx+gw*i/4; ln(ctx,cx,base-gh*0.1,cx,base); }
+      [[0.72,0.08],[0.82,0.05],[0.9,0.09]].forEach(function(p){
+        circ(ctx, p[0]*w, base-h*0.22-p[1]*h, w*0.05);
+        ln(ctx, p[0]*w, base-h*0.17, p[0]*w, base);
+      });
+    }
+  };
+
+  // ---------- shareable result image ----------
+  function hexToRgba(hex, alpha){
+    var rgb = hexToRgb(hex);
+    return "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + "," + alpha + ")";
+  }
+
+  function wrapTextLines(ctx, text, maxWidth){
+    var words = text.split(/\s+/);
+    var lines = [];
+    var cur = "";
+    words.forEach(function(w){
+      var test = cur ? cur + " " + w : w;
+      if (ctx.measureText(test).width > maxWidth && cur){
+        lines.push(cur);
+        cur = w;
+      } else {
+        cur = test;
+      }
+    });
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  function drawWrapped(ctx, text, x, y, maxWidth, lineHeight){
+    var lines = wrapTextLines(ctx, text, maxWidth);
+    lines.forEach(function(line, i){ ctx.fillText(line, x, y + i*lineHeight); });
+    return y + lines.length*lineHeight;
+  }
+
+  function roundRectPath(ctx, x, y, w, h, r){
+    if (ctx.roundRect){ ctx.beginPath(); ctx.roundRect(x, y, w, h, r); return; }
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+  }
+
+  function drawChips(ctx, items, x, y, maxWidth, accentHex){
+    ctx.font = '400 22px "IBM Plex Mono", monospace';
+    ctx.textBaseline = "middle";
+    var chipH = 46, gapX = 12, gapY = 14, padX = 18;
+    var curX = x, curY = y + chipH/2;
+    items.forEach(function(label){
+      var tw = ctx.measureText(label).width;
+      var chipW = tw + padX*2;
+      if (curX + chipW > x + maxWidth && curX > x){ curX = x; curY += chipH + gapY; }
+      ctx.fillStyle = "#f9f5db";
+      ctx.strokeStyle = hexToRgba(accentHex, 0.45);
+      ctx.lineWidth = 2;
+      roundRectPath(ctx, curX, curY - chipH/2, chipW, chipH, chipH/2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#44523d";
+      ctx.fillText(label, curX + padX, curY);
+      curX += chipW + gapX;
+    });
+    ctx.textBaseline = "alphabetic";
+    return curY + chipH/2;
+  }
+
+  function buildResultCanvas(area, lang){
+    var W = 1080, H = 1500, motifH = 520, marginX = 72, contentW = W - marginX*2;
+    var canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#fefdfb";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = hexToRgba(area.accent, 0.22);
+    ctx.fillRect(0, 0, W, motifH);
+
+    ctx.save();
+    ctx.strokeStyle = area.accent;
+    ctx.fillStyle = area.accent;
+    ctx.lineWidth = 3;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    var motifFn = MOTIFS[area.motif];
+    if (motifFn) motifFn(ctx, W, motifH);
+    ctx.restore();
+
+    ctx.strokeStyle = hexToRgba(area.accent, 0.35);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, motifH); ctx.lineTo(W, motifH); ctx.stroke();
+
+    var s = STRINGS[lang];
+    var cursorY = motifH + 76;
+
+    ctx.font = '500 22px "IBM Plex Mono", monospace';
+    ctx.fillStyle = "#b9aa97";
+    var eyebrowText = lang === "en" ? s.yourMatch.toUpperCase() : s.yourMatch;
+    ctx.fillText(eyebrowText, marginX, cursorY);
+    cursorY += 68;
+
+    ctx.font = '400 72px "Jua", sans-serif';
+    ctx.fillStyle = "#d87348";
+    ctx.fillText(area.name, marginX, cursorY);
+    cursorY += 56;
+
+    var linesText = area.linesNote ? area.linesNote[lang] : area.lines.join(" · ");
+    var metaText = s.zoneLabel + " " + zoneDisplay(area.zone) + "   ·   " + linesText;
+    ctx.font = '400 24px "IBM Plex Mono", monospace';
+    ctx.fillStyle = "#44523d";
+    cursorY = drawWrapped(ctx, metaText, marginX, cursorY, contentW, 34) + 36;
+
+    cursorY = drawChips(ctx, area.tags[lang], marginX, cursorY, contentW, area.accent) + 44;
+
+    ctx.font = '400 30px "Gowun Dodum", sans-serif';
+    ctx.fillStyle = "#44523d";
+    cursorY = drawWrapped(ctx, area.desc.body[lang], marginX, cursorY, contentW, 46) + 30;
+
+    ctx.font = '400 23px "IBM Plex Mono", monospace';
+    ctx.fillStyle = "#87986a";
+    drawWrapped(ctx, area.desc.tags, marginX, cursorY, contentW, 32);
+
+    ctx.font = '500 20px "IBM Plex Mono", monospace';
+    ctx.fillStyle = "#b9aa97";
+    ctx.textAlign = "center";
+    ctx.fillText("FIND YOUR LONDON", W/2, H - 46);
+    ctx.textAlign = "left";
+
+    return canvas;
+  }
+
+  async function handleSaveImage(){
+    if (!lastArea) return;
+    var btn = document.getElementById("save-btn");
+    var status = document.getElementById("save-status");
+    var s = t();
+    var originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = s.saveBtnBusy;
+    status.textContent = "";
+
+    try {
+      if (document.fonts && document.fonts.ready){
+        await document.fonts.ready;
+        try {
+          await Promise.all([
+            document.fonts.load('400 72px "Jua"'),
+            document.fonts.load('400 30px "Gowun Dodum"'),
+            document.fonts.load('500 22px "IBM Plex Mono"')
+          ]);
+        } catch (fontErr) { /* best effort — draw with whatever is ready */ }
+      }
+
+      var canvas = buildResultCanvas(lastArea, state.lang);
+      var blob = await new Promise(function(resolve){
+        canvas.toBlob(function(b){ resolve(b); }, "image/jpeg", 0.92);
+      });
+      if (!blob) throw new Error("toBlob failed");
+
+      if (typeof window.claude === "undefined" || typeof window.claude.use !== "function"){
+        status.textContent = s.saveUnavailable;
+        return;
+      }
+      var downloads = await window.claude.use("downloads");
+      if (!downloads){
+        status.textContent = s.saveUnavailable;
+        return;
+      }
+      var filename = "find-your-london-" + lastArea.name.toLowerCase().replace(/\s+/g, "-") + ".jpg";
+      await downloads.save({ filename: filename, data: blob });
+    } catch (err){
+      if (!err || err.code !== "declined"){
+        status.textContent = s.saveError;
+      }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  }
+
+  document.getElementById("save-btn").addEventListener("click", handleSaveImage);
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function(){
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(function(){
+      if (lastArea) drawMotif(lastArea);
+      gridCanvases.forEach(function(g){ drawMotifOnCanvas(g.canvas, g.area); });
+    }, 120);
+  });
+
+  // ---------- language ----------
+  function applyLanguage(){
+    document.documentElement.lang = t().htmlLang;
+    document.getElementById("lang-toggle").textContent = t().langToggle;
+    renderIntroText();
+    var visible = document.querySelector(".view:not([hidden])");
+    if (visible && visible.id === "view-quiz") renderQuiz();
+    if (visible && visible.id === "view-result" && lastArea) renderResult(lastArea);
+  }
+
+  document.getElementById("lang-toggle").addEventListener("click", function(){
+    state.lang = state.lang === "ko" ? "en" : "ko";
+    applyLanguage();
+  });
+
+  // ---------- wire up ----------
+  document.getElementById("start-btn").addEventListener("click", function(){
+    state.qIndex = 0;
+    state.answers = [];
+    showView("view-quiz");
+    renderQuiz();
+  });
+  document.getElementById("back-btn").addEventListener("click", function(){
+    if (state.qIndex > 0){ state.qIndex -= 1; renderQuiz(); }
+  });
+  document.getElementById("retake-btn").addEventListener("click", function(){
+    state.qIndex = 0;
+    state.answers = [];
+    showView("view-intro");
+  });
+
+  buildIntroLine();
+  buildStations();
+  buildAreaGrid();
+  applyLanguage();
+})();
+</script>
+
+</body>
+</html>

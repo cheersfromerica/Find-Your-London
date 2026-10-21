@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How The Match Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    /* Ericatoon Design System — tokens/colors.css, typography.css, spacing.css */
+    --cream-0:#fefdfb; --cream-100:#f6f0e6; --butter-100:#f9f5db;
+    --green-100:#cfe1b9; --green-200:#b5c99a; --green-300:#97a97c; --green-400:#87986a; --green-500:#6f8760; --green-900:#44523d;
+    --clay-200:#d99a8a; --clay-300:#d2886a; --clay-400:#c98d72; --clay-500:#d87348;
+    --taupe-300:#b9aa97;
+
+    --surface-page:var(--cream-100); --surface-card:var(--cream-0); --surface-tint:var(--butter-100); --surface-mint:var(--green-100);
+    --text-body:var(--green-900); --text-muted:var(--green-400); --text-faint:var(--taupe-300);
+    --text-on-accent:var(--cream-0); --text-on-clay:var(--cream-0);
+    --accent:var(--green-500); --accent-hover:var(--green-900); --accent-soft:var(--green-200);
+    --highlight:var(--clay-500); --highlight-soft:var(--clay-200);
+    --border:rgba(68,82,61,.16); --border-strong:rgba(68,82,61,.32);
+    --focus-ring:0 0 0 3px rgba(111,135,96,.35);
+
+    --font-display:'Jua', ui-rounded, sans-serif;
+    --font-body:'Gowun Dodum', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --text-xs:12px; --text-sm:14px; --text-md:16px; --text-lg:20px; --text-xl:26px; --text-2xl:34px; --text-3xl:46px;
+    --leading-tight:1.2; --leading-body:1.65; --track-display:-0.01em;
+
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px; --sp-8:64px;
+    --radius-sm:8px; --radius-md:12px; --radius-lg:20px; --radius-xl:28px; --radius-pill:999px;
+    --shadow-sm:0 1px 2px rgba(68,82,61,.08);
+    --shadow-md:0 4px 12px rgba(68,82,61,.10);
+  }
+  /* single warm paper theme by design — Ericatoon has no dark variant, so this page commits to one look */
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--surface-page);
+    color:var(--text-body);
+    font-family:var(--font-body);
+    font-size:var(--text-md);
+    line-height:var(--leading-body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){ *{transition-duration:0.001ms !important;} }
+
+  h1,h2,h3{ font-family:var(--font-display); font-weight:400; letter-spacing:var(--track-display); margin:0; text-wrap:balance; }
+  .mono{ font-family:var(--font-mono); letter-spacing:0.02em; }
+  .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); }
+
+  :focus-visible{ outline:none; box-shadow:var(--focus-ring); border-radius:var(--radius-sm); }
+
+  .page{ max-width:1080px; margin:0 auto; padding:var(--sp-8) var(--sp-5) 100px; }
+
+  header.intro{ display:flex; flex-direction:column; gap:var(--sp-4); margin-bottom:var(--sp-8); max-width:70ch; }
+  header.intro h1{ font-size:clamp(28px, 5vw, var(--text-3xl)); line-height:var(--leading-tight); }
+  header.intro h1 em{ font-style:normal; color:var(--accent); }
+  header.intro p{ color:var(--text-muted); font-size:var(--text-md); line-height:var(--leading-body); max-width:62ch; }
+
+  section.block{ margin-bottom:var(--sp-8); }
+  section.block h2{ font-size:var(--text-xl); margin-bottom:var(--sp-2); color:var(--text-body); }
+  section.block > p.lede{ color:var(--text-muted); max-width:62ch; margin:0 0 var(--sp-5); font-size:var(--text-sm); line-height:var(--leading-body); }
+
+  .card{ background:var(--surface-card); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); }
+
+  figure{ margin:0; padding:var(--sp-5); }
+  figure svg{ display:block; width:100%; height:auto; color:var(--text-body); }
+  figure .flow-box{ stroke:currentColor; fill:var(--surface-tint); stroke-width:1.5; }
+  figure .flow-box-title{ fill:currentColor; font-family:var(--font-display); font-weight:400; font-size:16px; }
+  figure .flow-box-sub{ fill:currentColor; opacity:0.75; font-family:var(--font-body); font-size:12px; }
+  figure .flow-box-example{ fill:currentColor; opacity:0.85; font-family:var(--font-mono); font-size:10.5px; }
+  figure .flow-arrow{ stroke:currentColor; stroke-width:2; fill:none; stroke-linecap:round; }
+  figure .flow-arrow-label{ fill:currentColor; opacity:0.8; font-family:var(--font-mono); font-size:11px; text-anchor:middle; }
+  figure .flow-highlight{ stroke:var(--highlight); fill:var(--highlight); stroke-width:2.5; }
+  figure .flow-highlight-arrow{ stroke:var(--highlight); stroke-width:2.5; }
+  figure .flow-highlight-label{ fill:var(--highlight); font-weight:500; opacity:1; }
+  figure .flow-highlight-title{ fill:var(--text-on-clay); }
+  figure .arrowhead-fill{ fill:currentColor; }
+  figure .arrowhead-accent{ fill:var(--highlight); }
+  figcaption{ margin-top:var(--sp-4); color:var(--text-muted); font-size:var(--text-sm); line-height:var(--leading-body); max-width:62ch; }
+
+  .matrix-card{ overflow-x:auto; padding:var(--sp-3) var(--sp-3) var(--sp-4); }
+  .matrix{ min-width:760px; }
+  .matrix-head, .matrix-row, .matrix-group-head{
+    display:grid;
+    align-items:center;
+    grid-template-columns:var(--cols);
+  }
+  .matrix-head{ border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface-card); z-index:1; }
+  .matrix-head > div, .matrix-row > div{ padding:8px 7px; }
+  .matrix-head .colname{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-faint); text-align:center; }
+  .matrix-head .rowlabel-head{ color:var(--text-faint); font-size:10.5px; font-family:var(--font-mono); letter-spacing:0.05em; text-transform:uppercase; }
+  .matrix-group-head{ grid-column:1 / -1; background:var(--surface-card); padding:10px 7px 4px; border-top:1px solid var(--border); }
+  .matrix-group-head:first-of-type{ border-top:none; }
+  .matrix-group-head .qtag{ font-family:var(--font-mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-faint); }
+  .matrix-group-head .qtext{ font-size:13px; color:var(--text-body); margin-left:8px; font-family:var(--font-body); }
+  .matrix-row{ border-top:1px solid var(--border); }
+  .matrix-row .rowlabel{ font-size:12.5px; color:var(--text-body); font-family:var(--font-body); }
+  .matrix-row .arealabel{ font-size:13px; color:var(--text-body); font-family:var(--font-display); }
+  .cell{ display:flex; align-items:center; justify-content:center; height:30px; border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:11.5px; font-variant-numeric:tabular-nums; }
+  .cell.zero{ color:var(--text-faint); background:transparent; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:var(--sp-4); font-size:0.8rem; color:var(--text-muted); font-family:var(--font-body); }
+  .legend .swatch-row{ display:flex; align-items:center; gap:7px; }
+  .legend .chip{ width:20px; height:16px; border-radius:var(--radius-sm); display:inline-block; }
+  .legend .ramp{ display:flex; height:12px; width:150px; border-radius:var(--radius-sm); overflow:hidden; }
+  .legend .ramp span{ flex:1; }
+
+  .site-footer{
+    text-align:center;
+    padding:var(--sp-5) var(--sp-5) var(--sp-6);
+    font-family:var(--font-mono), monospace;
+    font-size:0.72rem;
+    letter-spacing:0.02em;
+    color:var(--text-faint, #b9aa97);
+  }
+  .site-footer a{
+    color:inherit;
+    text-decoration:underline;
+    text-decoration-color:var(--border-strong, rgba(68,82,61,.32));
+  }
+  .site-footer a:hover{ color:var(--accent-hover, #44523d); }
+</style>
+
+
+</head>
+<body>
+<div class="page">
+  <header class="intro">
+    <div class="eyebrow">Find Your London &middot; behind the match</div>
+    <h1>How an answer becomes an <em>area</em>.</h1>
+    <p>Every choice in the quiz nudges eight underlying traits. After ten questions those traits are rescaled and measured against twelve fixed London-area profiles — whichever area sits closest wins. The flow below is the mechanism; the tables beneath it are the actual numbers, so you can see &mdash; and push back on &mdash; exactly what's driving each result.</p>
+  </header>
+
+  <section class="block">
+    <h2>The pipeline</h2>
+    <p class="lede">One path from a tapped answer to a recommended neighbourhood.</p>
+    <figure class="card">
+      <svg id="flow-svg" viewBox="0 0 1200 420" role="img" aria-label="Flowchart: your ten quiz answers sum into eight trait totals, which are normalized to a 0 to 10 scale per trait, then compared by squared distance against twelve fixed London-area trait profiles. The area with the smallest distance, tie-broken on energy and family closeness, becomes your result.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path class="arrowhead-fill" d="M0,0 L10,5 L0,10 z"></path>
+          </marker>
+          <marker id="arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path class="arrowhead-accent" d="M0,0 L10,5 L0,10 z"></path>
+          </marker>
+          <filter id="paperShadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#44523d" flood-opacity="0.16"></feDropShadow>
+          </filter>
+        </defs>
+
+        <!-- box 0 -->
+        <rect class="flow-box" x="37" y="60" width="195" height="110" rx="16" filter="url(#paperShadow)"></rect>
+        <text class="flow-box-title" x="134.5" y="85" text-anchor="middle">Your 10 answers</text>
+        <text class="flow-box-sub" x="134.5" y="104" text-anchor="middle">each choice adds a delta</text>
+        <text class="flow-box-sub" x="134.5" y="119" text-anchor="middle">to 2&ndash;3 of 8 traits</text>
+        <text class="flow-box-example" x="134.5" y="141" text-anchor="middle">&ldquo;Buzzing &amp; lively&rdquo;</text>
+        <text class="flow-box-example" x="134.5" y="155" text-anchor="middle">&rarr; energy +3, culture +2</text>
+
+        <!-- arrow 0->1 -->
+        <line class="flow-arrow" x1="232" y1="115" x2="266" y2="115" marker-end="url(#arrow)"></line>
+        <text class="flow-arrow-label" x="251" y="100">sum all</text>
+        <text class="flow-arrow-label" x="251" y="112">10 choices</text>
+
+        <!-- box 1 -->
+        <rect class="flow-box" x="270" y="60" width="195" height="110" rx="16" filter="url(#paperShadow)"></rect>
+        <text class="flow-box-title" x="367.5" y="91" text-anchor="middle">Raw trait totals</text>
+        <text class="flow-box-sub" x="367.5" y="112" text-anchor="middle">one running number</text>
+        <text class="flow-box-sub" x="367.5" y="127" text-anchor="middle">per trait &mdash; can be negative</text>
+
+        <!-- arrow 1->2 -->
+        <line class="flow-arrow" x1="465" y1="115" x2="499" y2="115" marker-end="url(#arrow)"></line>
+        <text class="flow-arrow-label" x="484" y="94">normalize using</text>
+        <text class="flow-arrow-label" x="484" y="106">each trait's min/max</text>
+        <text class="flow-arrow-label" x="484" y="118">across the 10 questions</text>
+
+        <!-- box 2 -->
+        <rect class="flow-box" x="503" y="60" width="195" height="110" rx="16" filter="url(#paperShadow)"></rect>
+        <text class="flow-box-title" x="600.5" y="91" text-anchor="middle">Your normalized profile</text>
+        <text class="flow-box-sub" x="600.5" y="112" text-anchor="middle">same 8 traits,</text>
+        <text class="flow-box-sub" x="600.5" y="127" text-anchor="middle">rescaled 0&ndash;10</text>
+
+        <!-- arrow 2->3 -->
+        <line class="flow-arrow" x1="698" y1="115" x2="732" y2="115" marker-end="url(#arrow)"></line>
+        <text class="flow-arrow-label" x="717" y="104">vs. 12</text>
+        <text class="flow-arrow-label" x="717" y="116">profiles</text>
+
+        <!-- box 3 : comparison node -->
+        <rect class="flow-box" x="736" y="60" width="195" height="110" rx="16" filter="url(#paperShadow)"></rect>
+        <text class="flow-box-title" x="833.5" y="91" text-anchor="middle">Distance to each area</text>
+        <text class="flow-box-sub" x="833.5" y="112" text-anchor="middle">squared difference per trait,</text>
+        <text class="flow-box-sub" x="833.5" y="127" text-anchor="middle">summed across all 8</text>
+
+        <!-- child box: fixed area data feeding the comparison -->
+        <rect class="flow-box" x="703.5" y="300" width="260" height="90" rx="16" filter="url(#paperShadow)"></rect>
+        <text class="flow-box-title" x="833.5" y="327" text-anchor="middle">12 London areas</text>
+        <text class="flow-box-sub" x="833.5" y="347" text-anchor="middle">pre-scored 0&ndash;10</text>
+        <text class="flow-box-sub" x="833.5" y="361" text-anchor="middle">on the same 8 traits</text>
+
+        <!-- vertical arrow: child box -> box3 -->
+        <line class="flow-arrow" x1="833.5" y1="300" x2="833.5" y2="174" marker-end="url(#arrow)"></line>
+        <text class="flow-arrow-label" x="905" y="242">compared</text>
+        <text class="flow-arrow-label" x="905" y="254">against</text>
+
+        <!-- arrow 3->4 : the decisive hop, highlighted -->
+        <line class="flow-highlight-arrow" x1="931" y1="115" x2="965" y2="115" marker-end="url(#arrow-accent)"></line>
+        <text class="flow-arrow-label flow-highlight-label" x="950" y="94">smallest distance</text>
+        <text class="flow-arrow-label flow-highlight-label" x="950" y="106">wins</text>
+        <text class="flow-arrow-label" x="950" y="131">(tie-break: energy</text>
+        <text class="flow-arrow-label" x="950" y="143">+ family)</text>
+
+        <!-- box 4 : result, highlighted -->
+        <rect class="flow-highlight" x="969" y="60" width="195" height="110" rx="16" filter="url(#paperShadow)"></rect>
+        <text class="flow-box-title flow-highlight-title" x="1066.5" y="110" text-anchor="middle">Your result</text>
+        <text class="flow-box-sub flow-highlight-title" x="1066.5" y="132" text-anchor="middle">one of 12 areas</text>
+      </svg>
+      <figcaption>Ten answers accumulate into eight trait totals, get rescaled to 0&ndash;10, and are measured against twelve fixed area profiles scored on those same traits. Whichever area sits closest &mdash; by squared distance, tie-broken on energy and family &mdash; is the result.</figcaption>
+    </figure>
+  </section>
+
+  <section class="block">
+    <h2>Which answers move which traits</h2>
+    <p class="lede">All 10 questions, every option, and exactly what each one adds or subtracts across the 8 traits. Green adds to a trait, clay subtracts from it; darker means a bigger effect.</p>
+    <div class="matrix-card card">
+      <div class="matrix" id="delta-matrix"></div>
+    </div>
+    <div class="legend">
+      <span class="swatch-row"><span class="chip" style="background:#6f8760"></span> adds, strongly</span>
+      <span class="swatch-row"><span class="chip" style="background:#cfe1b9"></span> adds, lightly</span>
+      <span class="swatch-row"><span class="chip" style="background:#d87348"></span> subtracts, strongly</span>
+      <span class="swatch-row"><span class="chip" style="background:#d99a8a"></span> subtracts, lightly</span>
+      <span class="swatch-row"><span class="chip" style="background:transparent;border:1px solid var(--border-strong)"></span> no effect</span>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>How the 12 areas score on the same 8 traits</h2>
+    <p class="lede">The fixed reference data every quiz-taker gets measured against. Lighter means low on that trait, darker means high.</p>
+    <div class="matrix-card card">
+      <div class="matrix" id="profile-matrix"></div>
+    </div>
+    <div class="legend">
+      <span class="swatch-row">0<span class="ramp" id="profile-ramp"></span>10</span>
+    </div>
+  </section>
+</div>
+
+<footer class="site-footer">&copy; 2026 &middot; <a href="https://instagram.com/cheers.from.erica" target="_blank" rel="noopener noreferrer">@cheers.from.erica</a></footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var DIMS = [
+    { key:"energy", label:"Energy" },
+    { key:"community", label:"Comm." },
+    { key:"afford", label:"Afford" },
+    { key:"green", label:"Green" },
+    { key:"culture", label:"Culture" },
+    { key:"family", label:"Family" },
+    { key:"connectivity", label:"Connect" },
+    { key:"riverside", label:"River" }
+  ];
+
+  var QUESTIONS = [
+    { tag:"Q1 · Energy", text:"What kind of energy do you want where you live?", options:[
+      { label:"Buzzing and lively", delta:{energy:3, culture:2} },
+      { label:"Easygoing and social", delta:{community:2, energy:1} },
+      { label:"Calm and quiet", delta:{energy:-3, green:1} }
+    ]},
+    { tag:"Q2 · Priority", text:"What matters most when picking where to live?", options:[
+      { label:"A strong sense of community", delta:{community:3} },
+      { label:"Space and privacy", delta:{family:2, green:1} },
+      { label:"Close to everything", delta:{culture:2, connectivity:1} }
+    ]},
+    { tag:"Q3 · Weekend", text:"Your ideal weekend looks like:", options:[
+      { label:"Street market, gallery, café", delta:{culture:3} },
+      { label:"Long walk, park or river", delta:{green:2, riverside:2} },
+      { label:"Catch up at the local", delta:{community:3} }
+    ]},
+    { tag:"Q4 · Commute", text:"How do you feel about the commute?", options:[
+      { label:"Door-to-desk under 30 min", delta:{connectivity:3} },
+      { label:"Trade commute for a nicer home", delta:{connectivity:-2, family:1, green:1} },
+      { label:"Somewhere in between", delta:{connectivity:1} }
+    ]},
+    { tag:"Q5 · Budget", text:"Which is closest to your budget reality?", options:[
+      { label:"Most space for my money", delta:{afford:3} },
+      { label:"Pay a premium for the right spot", delta:{afford:-3, connectivity:1} },
+      { label:"Comfortably in the middle", delta:{afford:1} }
+    ]},
+    { tag:"Q6 · Housing", text:"Which home can you picture yourself in?", options:[
+      { label:"Period terrace, classic street", delta:{family:1, community:2} },
+      { label:"Modern flat, by the water", delta:{riverside:2, connectivity:1} },
+      { label:"Suburban house with a garden", delta:{green:2, family:2} }
+    ]},
+    { tag:"Q7 · Nightlife", text:"How close do you want nightlife and good food?", options:[
+      { label:"On my doorstep", delta:{culture:2, energy:2} },
+      { label:"Happy to travel into town", delta:{energy:-2} },
+      { label:"A couple of good locals", delta:{community:2} }
+    ]},
+    { tag:"Q8 · Household", text:"Who is this home for?", options:[
+      { label:"Solo / housemates, want central", delta:{energy:2, connectivity:2} },
+      { label:"Settling down / starting a family", delta:{family:3, green:1} },
+      { label:"A couple, social and calm", delta:{community:2} }
+    ]},
+    { tag:"Q9 · Green space", text:"How important is green space?", options:[
+      { label:"Essential, a park nearby is a must", delta:{green:3} },
+      { label:"Nice to have, not essential", delta:{green:1} },
+      { label:"Not fussed, near the action instead", delta:{green:-2, energy:1} }
+    ]},
+    { tag:"Q10 · The scene", text:"Which scene appeals to you most?", options:[
+      { label:"Skyscrapers and river views", delta:{riverside:2, connectivity:1, culture:1} },
+      { label:"Independent shops and studios", delta:{culture:2, energy:1} },
+      { label:"Tree-lined, village high-street charm", delta:{community:2, green:1, family:1} }
+    ]}
+  ];
+
+  var AREAS = [
+    { name:"Canary Wharf", profile:{energy:7,community:3,afford:2,green:4,culture:6,family:3,connectivity:9,riverside:9} },
+    { name:"Shoreditch", profile:{energy:9,community:5,afford:3,green:2,culture:10,family:2,connectivity:8,riverside:3} },
+    { name:"Clapham", profile:{energy:8,community:7,afford:5,green:7,culture:6,family:5,connectivity:8,riverside:2} },
+    { name:"Hammersmith", profile:{energy:6,community:5,afford:5,green:5,culture:5,family:5,connectivity:8,riverside:8} },
+    { name:"Wimbledon", profile:{energy:4,community:7,afford:3,green:9,culture:5,family:9,connectivity:6,riverside:2} },
+    { name:"Ealing", profile:{energy:4,community:8,afford:6,green:8,culture:5,family:9,connectivity:7,riverside:2} },
+    { name:"Richmond", profile:{energy:3,community:7,afford:2,green:10,culture:6,family:8,connectivity:5,riverside:9} },
+    { name:"Greenwich", profile:{energy:5,community:6,afford:6,green:7,culture:8,family:6,connectivity:6,riverside:9} },
+    { name:"Islington", profile:{energy:7,community:7,afford:3,green:4,culture:8,family:5,connectivity:9,riverside:2} },
+    { name:"Notting Hill", profile:{energy:6,community:6,afford:2,green:6,culture:8,family:5,connectivity:8,riverside:2} },
+    { name:"Brixton", profile:{energy:9,community:9,afford:6,green:5,culture:9,family:4,connectivity:8,riverside:1} },
+    { name:"Dulwich", profile:{energy:3,community:7,afford:4,green:9,culture:6,family:9,connectivity:4,riverside:1} }
+  ];
+
+  // brand tokens reused verbatim from the Ericatoon Design System (tokens/colors.css)
+  var GREEN_LIGHT = {r:0xcf,g:0xe1,b:0xb9};   // --green-100
+  var GREEN_DARK  = {r:0x44,g:0x52,b:0x3d};   // --green-900
+  var POS_STEPS = { 1:"#cfe1b9", 2:"#97a97c", 3:"#6f8760" }; // green-100 / 300 / 500
+  var NEG_STEPS = { 1:"#d99a8a", 2:"#d2886a", 3:"#d87348" }; // clay-200 / 300 / 500
+  var TEXT_ON_LIGHT = "#44523d"; // --text-body
+  var TEXT_ON_DARK  = "#fefdfb"; // --text-on-accent / --text-on-clay
+
+  function lerp(a, b, t){ return Math.round(a + (b - a) * t); }
+
+  function sequential(value0to10){
+    var t = Math.max(0, Math.min(1, value0to10 / 10));
+    var r = lerp(GREEN_LIGHT.r, GREEN_DARK.r, t);
+    var g = lerp(GREEN_LIGHT.g, GREEN_DARK.g, t);
+    var b = lerp(GREEN_LIGHT.b, GREEN_DARK.b, t);
+    var hex = "#" + [r,g,b].map(function(n){ return n.toString(16).padStart(2,"0"); }).join("");
+    var luminance = 0.299*r + 0.587*g + 0.114*b;
+    return { hex:hex, text: luminance < 140 ? TEXT_ON_DARK : TEXT_ON_LIGHT };
+  }
+
+  function textFor(hex){
+    var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    var luminance = 0.299*r + 0.587*g + 0.114*b;
+    return luminance < 140 ? TEXT_ON_DARK : TEXT_ON_LIGHT;
+  }
+
+  function setCols(el, firstColWidth){
+    el.style.setProperty("--cols", firstColWidth + "px repeat(" + DIMS.length + ", minmax(44px,1fr))");
+  }
+
+  function headerRow(firstColLabel){
+    var row = document.createElement("div");
+    row.className = "matrix-head";
+    var first = document.createElement("div");
+    first.className = "rowlabel-head";
+    first.textContent = firstColLabel;
+    row.appendChild(first);
+    DIMS.forEach(function(d){
+      var c = document.createElement("div");
+      c.className = "colname";
+      c.textContent = d.label;
+      row.appendChild(c);
+    });
+    return row;
+  }
+
+  function renderDeltaMatrix(){
+    var mount = document.getElementById("delta-matrix");
+    setCols(mount, 240);
+    mount.appendChild(headerRow("Question / option"));
+
+    QUESTIONS.forEach(function(q){
+      var gh = document.createElement("div");
+      gh.className = "matrix-group-head";
+      gh.innerHTML = '<span class="qtag">'+q.tag+'</span><span class="qtext">'+q.text+'</span>';
+      mount.appendChild(gh);
+
+      q.options.forEach(function(opt){
+        var row = document.createElement("div");
+        row.className = "matrix-row";
+        var label = document.createElement("div");
+        label.className = "rowlabel";
+        label.textContent = opt.label;
+        row.appendChild(label);
+
+        DIMS.forEach(function(d){
+          var v = opt.delta[d.key] || 0;
+          var wrap = document.createElement("div");
+          wrap.style.display = "flex";
+          var cell = document.createElement("span");
+          cell.className = "cell";
+          if (v === 0){
+            cell.classList.add("zero");
+            cell.textContent = "·";
+            cell.title = d.label + ": no effect";
+          } else {
+            var mag = Math.abs(v);
+            var hex = v > 0 ? (POS_STEPS[mag] || POS_STEPS[3]) : (NEG_STEPS[mag] || NEG_STEPS[3]);
+            cell.style.background = hex;
+            cell.style.color = textFor(hex);
+            cell.textContent = (v > 0 ? "+" : "−") + mag;
+            cell.title = d.label + ": " + (v>0?"+":"") + v;
+          }
+          wrap.appendChild(cell);
+          row.appendChild(wrap);
+        });
+        mount.appendChild(row);
+      });
+    });
+  }
+
+  function renderProfileMatrix(){
+    var mount = document.getElementById("profile-matrix");
+    setCols(mount, 160);
+    mount.appendChild(headerRow("Area"));
+
+    AREAS.forEach(function(area){
+      var row = document.createElement("div");
+      row.className = "matrix-row";
+      var label = document.createElement("div");
+      label.className = "arealabel";
+      label.textContent = area.name;
+      row.appendChild(label);
+
+      DIMS.forEach(function(d){
+        var v = area.profile[d.key];
+        var wrap = document.createElement("div");
+        wrap.style.display = "flex";
+        var cell = document.createElement("span");
+        cell.className = "cell";
+        var c = sequential(v);
+        cell.style.background = c.hex;
+        cell.style.color = c.text;
+        cell.textContent = v;
+        cell.title = area.name + " · " + d.label + ": " + v + "/10";
+        wrap.appendChild(cell);
+        row.appendChild(wrap);
+      });
+      mount.appendChild(row);
+    });
+  }
+
+  function renderRampLegend(){
+    var ramp = document.getElementById("profile-ramp");
+    [0,0.2,0.4,0.6,0.8,1].forEach(function(t){
+      var c = sequential(t*10);
+      var span = document.createElement("span");
+      span.style.background = c.hex;
+      ramp.appendChild(span);
+    });
+  }
+
+  renderDeltaMatrix();
+  renderProfileMatrix();
+  renderRampLegend();
+})();
+</script>
+
+</body>
+</html>
