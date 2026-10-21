@@ -467,7 +467,6 @@
       saveBtn:"Save as JPG",
       saveBtnBusy:"Saving…",
       saveError:"Couldn't save the image — try again.",
-      saveUnavailable:"Image saving isn't available in this view.",
       langToggle:"한국어"
     },
     ko: {
@@ -488,7 +487,6 @@
       saveBtn:"JPG로 저장",
       saveBtnBusy:"저장 중…",
       saveError:"이미지를 저장하지 못했어요 — 다시 시도해 주세요.",
-      saveUnavailable:"이 화면에서는 이미지 저장을 사용할 수 없어요.",
       langToggle:"English"
     }
   };
@@ -1114,6 +1112,31 @@
     return canvas;
   }
 
+  async function getClaudeDownloadsCapability(){
+    if (typeof window.claude === "undefined" || typeof window.claude.use !== "function") return null;
+    try { return await window.claude.use("downloads"); } catch (e){ return null; }
+  }
+
+  async function saveBlobAsFile(filename, blob){
+    // Inside the Claude Artifact viewer, a page can't trigger a browser download
+    // directly — it has to hand the file to the platform's own save prompt.
+    var downloads = await getClaudeDownloadsCapability();
+    if (downloads){
+      await downloads.save({ filename: filename, data: blob });
+      return;
+    }
+    // On a plain deployed site (e.g. GitHub Pages) there's no such bridge —
+    // a normal browser download works natively here.
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
   async function handleSaveImage(){
     if (!lastArea) return;
     var btn = document.getElementById("save-btn");
@@ -1142,17 +1165,8 @@
       });
       if (!blob) throw new Error("toBlob failed");
 
-      if (typeof window.claude === "undefined" || typeof window.claude.use !== "function"){
-        status.textContent = s.saveUnavailable;
-        return;
-      }
-      var downloads = await window.claude.use("downloads");
-      if (!downloads){
-        status.textContent = s.saveUnavailable;
-        return;
-      }
       var filename = "find-your-london-" + lastArea.name.toLowerCase().replace(/\s+/g, "-") + ".jpg";
-      await downloads.save({ filename: filename, data: blob });
+      await saveBlobAsFile(filename, blob);
     } catch (err){
       if (!err || err.code !== "declined"){
         status.textContent = s.saveError;
