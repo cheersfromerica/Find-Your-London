@@ -157,15 +157,11 @@
     border:1px solid var(--border);
     border-radius:var(--radius-md);
     padding:var(--sp-2);
-    display:flex;
-    flex-direction:column;
-    gap:6px;
     box-shadow:var(--shadow-sm);
     transition:box-shadow 150ms ease, transform 150ms ease;
   }
   .area-tile:hover{ box-shadow:var(--shadow-md); transform:translateY(-2px); }
   .area-tile img{ width:100%; aspect-ratio:1/1; display:block; object-fit:cover; border-radius:var(--radius-sm); }
-  .area-tile span{ font-family:var(--font-mono); font-size:11px; text-align:center; color:var(--text-body); letter-spacing:0.01em; }
 
   /* ---------- quiz ---------- */
   #view-quiz .shell{
@@ -717,12 +713,9 @@
       tile.className = "area-tile";
       var img = document.createElement("img");
       img.src = area.image;
-      img.alt = "";
+      img.alt = area.name;
       img.loading = "lazy";
       tile.appendChild(img);
-      var label = document.createElement("span");
-      label.textContent = area.name;
-      tile.appendChild(label);
       wrap.appendChild(tile);
     });
   }
