@@ -164,7 +164,7 @@
     transition:box-shadow 150ms ease, transform 150ms ease;
   }
   .area-tile:hover{ box-shadow:var(--shadow-md); transform:translateY(-2px); }
-  .area-tile canvas{ width:100%; aspect-ratio:4/3; display:block; border-radius:var(--radius-sm); }
+  .area-tile img{ width:100%; aspect-ratio:1/1; display:block; object-fit:cover; border-radius:var(--radius-sm); }
   .area-tile span{ font-family:var(--font-mono); font-size:11px; text-align:center; color:var(--text-body); letter-spacing:0.01em; }
 
   /* ---------- quiz ---------- */
@@ -301,7 +301,7 @@
     min-height:260px;
     background:var(--poster-canvas-bg, var(--surface-tint));
   }
-  .poster-canvas-wrap canvas{ width:100%; height:100%; display:block; }
+  .poster-canvas-wrap img{ width:100%; height:100%; display:block; object-fit:cover; }
   .result-foot{
     display:flex;
     justify-content:space-between;
@@ -423,7 +423,7 @@
           <p class="poster-desc" id="r-desc"></p>
         </div>
         <div class="poster-canvas-wrap">
-          <canvas id="r-canvas"></canvas>
+          <img id="r-image" alt="">
         </div>
       </div>
       <div class="result-foot">
@@ -545,86 +545,86 @@
   ];
 
   var AREAS = [
-    { name:"Canary Wharf", zone:"Zone 2", lines:["Jubilee line","DLR","Elizabeth line"],
-      tags:{en:["Skyline","Riverside","Business hub"], ko:["스카이라인","리버사이드","비즈니스 허브"]}, accent:"#7C8793", motif:"skyline",
+    { name:"Canary Wharf", image:"images/areas/canary-wharf.jpg", zone:"Zone 2", lines:["Jubilee line","DLR","Elizabeth line"],
+      tags:{en:["Skyline","Riverside","Business hub"], ko:["스카이라인","리버사이드","비즈니스 허브"]}, accent:"#7C8793",
       profile:{energy:7,community:3,afford:2,green:4,culture:6,family:3,connectivity:9,riverside:9},
       desc:{ body:{en:"Glass towers, river light, and a skyline that never really switches off. You live where London does business, with world-class food and transport on your doorstep.",
                    ko:"유리 타워와 강변의 빛, 꺼지지 않는 스카이라인. 런던의 비즈니스 중심지에서 살며, 세계적 수준의 맛집과 교통을 문 앞에 두는 삶입니다."},
              tags:"#skylineliving #workhardplayhard #riversideviews #alwaysconnected" } },
 
-    { name:"Shoreditch", zone:"Zone 1", lines:["Overground","Central line (Old St)"],
-      tags:{en:["Creative","Nightlife","Independent"], ko:["크리에이티브","나이트라이프","인디펜던트"]}, accent:"#C1572D", motif:"streetart",
+    { name:"Shoreditch", image:"images/areas/shoreditch.jpg", zone:"Zone 1", lines:["Overground","Central line (Old St)"],
+      tags:{en:["Creative","Nightlife","Independent"], ko:["크리에이티브","나이트라이프","인디펜던트"]}, accent:"#C1572D",
       profile:{energy:9,community:5,afford:3,green:2,culture:10,family:2,connectivity:8,riverside:3},
       desc:{ body:{en:"Street art, warehouse bars, and a creative scene that starts after dark. This is London at its most unfiltered.",
                    ko:"거리 예술과 창고를 개조한 바, 해가 지면 시작되는 크리에이티브 신. 가장 꾸밈없는 런던의 모습입니다."},
              tags:"#creativecore #nightowl #independentshops #neverboring" } },
 
-    { name:"Clapham", zone:"Zone 2", lines:["Northern line"],
-      tags:{en:["Common life","Social","Young crowd"], ko:["커먼 라이프","소셜","젊은 동네"]}, accent:"#33322E", motif:"bandstand",
+    { name:"Clapham", image:"images/areas/clapham.jpg", zone:"Zone 2", lines:["Northern line"],
+      tags:{en:["Common life","Social","Young crowd"], ko:["커먼 라이프","소셜","젊은 동네"]}, accent:"#33322E",
       profile:{energy:8,community:7,afford:5,green:7,culture:6,family:5,connectivity:8,riverside:2},
       desc:{ body:{en:"Common-side picnics by day, packed bars by night — Clapham is the classic young-London balance of green space and good times.",
                    ko:"낮에는 커먼(공원)에서의 피크닉, 밤에는 북적이는 바 — Clapham은 공원과 즐거움의 균형을 보여주는 전형적인 젊은 런던입니다."},
              tags:"#commonlife #socialbutton #easycommute #bestofbothworlds" } },
 
-    { name:"Hammersmith", zone:"Zone 2", lines:["District line","Piccadilly line"],
-      tags:{en:["Riverside","Commuter","Understated"], ko:["리버사이드","통근 요지","차분함"]}, accent:"#1F3A5F", motif:"bridge",
+    { name:"Hammersmith", image:"images/areas/hammersmith.jpg", zone:"Zone 2", lines:["District line","Piccadilly line"],
+      tags:{en:["Riverside","Commuter","Understated"], ko:["리버사이드","통근 요지","차분함"]}, accent:"#1F3A5F",
       profile:{energy:6,community:5,afford:5,green:5,culture:5,family:5,connectivity:8,riverside:8},
       desc:{ body:{en:"A working river town with a proper commuter backbone — towpath walks, theatre nights, and the City a short ride away.",
                    ko:"탄탄한 통근 노선을 갖춘 강변 동네 — 강가 산책로, 극장가의 밤, 그리고 멀지 않은 City까지. 꾸밈없이 실속 있는 곳입니다."},
              tags:"#riversidelife #wellconnected #understatedcharm #bridgeviews" } },
 
-    { name:"Wimbledon", zone:"Zone 3", lines:["District line","National Rail"],
-      tags:{en:["Village","Family-first","Leafy"], ko:["빌리지","가족 중심","녹음 가득"]}, accent:"#4B2E58", motif:"village",
+    { name:"Wimbledon", image:"images/areas/wimbledon.jpg", zone:"Zone 3", lines:["District line","National Rail"],
+      tags:{en:["Village","Family-first","Leafy"], ko:["빌리지","가족 중심","녹음 가득"]}, accent:"#4B2E58",
       profile:{energy:4,community:7,afford:3,green:9,culture:5,family:9,connectivity:6,riverside:2},
       desc:{ body:{en:"A village high street, century-old courts, and leafy commons at every turn — Wimbledon is London's favourite small-town escape.",
                    ko:"작은 마을 같은 번화가와 100년 역사의 코트, 곳곳의 푸른 커먼 — Wimbledon은 런던 사람들이 가장 사랑하는 소도시 같은 동네입니다."},
              tags:"#villagelife #familyfirst #greenandquiet #classicsuburb" } },
 
-    { name:"Ealing", zone:"Zone 3", lines:["Central line","Elizabeth line","District line"],
-      tags:{en:["Suburb royalty","Family-friendly","Leafy"], ko:["교외의 여왕","가족 친화적","녹음 가득"]}, accent:"#7C7FAE", motif:"avenue",
+    { name:"Ealing", image:"images/areas/ealing.jpg", zone:"Zone 3", lines:["Central line","Elizabeth line","District line"],
+      tags:{en:["Suburb royalty","Family-friendly","Leafy"], ko:["교외의 여왕","가족 친화적","녹음 가득"]}, accent:"#7C7FAE",
       profile:{energy:4,community:8,afford:6,green:8,culture:5,family:9,connectivity:7,riverside:2},
       desc:{ body:{en:"Known as the Queen of the Suburbs for a reason: wide avenues, good schools, and a fast line into town.",
                    ko:"'교외의 여왕'이라 불리는 데는 이유가 있습니다: 넓은 가로수길, 좋은 학교, 그리고 시내까지 빠르게 연결되는 노선까지."},
              tags:"#suburbqueen #familyfriendly #treelineliving #stillconnected" } },
 
-    { name:"Richmond", zone:"Zone 4", lines:["District line","Overground","National Rail"],
-      tags:{en:["Royal park","Riverside","Quiet luxury"], ko:["로열 파크","리버사이드","조용한 럭셔리"]}, accent:"#2E4A2E", motif:"deerpark",
+    { name:"Richmond", image:"images/areas/richmond.jpg", zone:"Zone 4", lines:["District line","Overground","National Rail"],
+      tags:{en:["Royal park","Riverside","Quiet luxury"], ko:["로열 파크","리버사이드","조용한 럭셔리"]}, accent:"#2E4A2E",
       profile:{energy:3,community:7,afford:2,green:10,culture:6,family:8,connectivity:5,riverside:9},
       desc:{ body:{en:"Deer in the park, the Thames at your feet, and some of the best green space in the capital. Quiet luxury, London-adjacent.",
                    ko:"공원을 거니는 사슴, 발 아래 흐르는 템즈강, 그리고 런던 최고 수준의 공원. 도심과 가까운 조용한 럭셔리입니다."},
              tags:"#parklife #riverside #quietluxury #natureonyourdoorstep" } },
 
-    { name:"Greenwich", zone:"Zone 2/3", lines:["DLR","Jubilee line (North Greenwich)"],
-      tags:{en:["Riverside","Heritage","Market town"], ko:["리버사이드","유서 깊은","마켓 타운"]}, accent:"#1E8A8C", motif:"observatory",
+    { name:"Greenwich", image:"images/areas/greenwich.jpg", zone:"Zone 2/3", lines:["DLR","Jubilee line (North Greenwich)"],
+      tags:{en:["Riverside","Heritage","Market town"], ko:["리버사이드","유서 깊은","마켓 타운"]}, accent:"#1E8A8C",
       profile:{energy:5,community:6,afford:6,green:7,culture:8,family:6,connectivity:6,riverside:9},
       desc:{ body:{en:"History, river views, and a market worth the walk — Greenwich mixes heritage with a genuine sense of place.",
                    ko:"역사와 강변 전망, 그리고 일부러 걸어갈 만한 마켓까지 — Greenwich는 유산과 고유한 동네 정취를 함께 갖추고 있습니다."},
              tags:"#riverhistory #markettown #parkandpalace #timelesslondon" } },
 
-    { name:"Islington", zone:"Zone 1/2", lines:["Northern line","Victoria line","Piccadilly line"],
-      tags:{en:["Georgian terraces","Upper Street","Central"], ko:["조지안 테라스","Upper Street","센트럴"]}, accent:"#5C2A3D", motif:"terrace",
+    { name:"Islington", image:"images/areas/islington.jpg", zone:"Zone 1/2", lines:["Northern line","Victoria line","Piccadilly line"],
+      tags:{en:["Georgian terraces","Upper Street","Central"], ko:["조지안 테라스","Upper Street","센트럴"]}, accent:"#5C2A3D",
       profile:{energy:7,community:7,afford:3,green:4,culture:8,family:5,connectivity:9,riverside:2},
       desc:{ body:{en:"Georgian terraces and Upper Street energy — Islington is for people who want culture and community on the same street.",
                    ko:"조지안 양식의 테라스 하우스와 Upper Street의 활기 — Islington은 같은 거리에서 문화와 커뮤니티를 모두 원하는 사람들을 위한 곳입니다."},
              tags:"#terracecharm #upperstreetlife #citycentral #stillhomely" } },
 
-    { name:"Notting Hill", zone:"Zone 1/2", lines:["Central line","Circle line","District line"],
-      tags:{en:["Boutique","Market mornings","Pastel streets"], ko:["부티크","마켓 아침","파스텔 거리"]}, accent:"#B8923A", motif:"pastelrow",
+    { name:"Notting Hill", image:"images/areas/notting-hill.jpg", zone:"Zone 1/2", lines:["Central line","Circle line","District line"],
+      tags:{en:["Boutique","Market mornings","Pastel streets"], ko:["부티크","마켓 아침","파스텔 거리"]}, accent:"#B8923A",
       profile:{energy:6,community:6,afford:2,green:6,culture:8,family:5,connectivity:8,riverside:2},
       desc:{ body:{en:"Pastel townhouses, Portobello markets, and a neighbourhood that photographs as good as it lives.",
                    ko:"파스텔톤 타운하우스와 Portobello 마켓, 그리고 사진으로 봐도 실제로 살아도 아름다운 동네입니다."},
              tags:"#pastelstreets #marketmornings #boutiqueliving #classicwest" } },
 
-    { name:"Brixton", zone:"Zone 2", lines:["Victoria line"],
-      tags:{en:["Community-first","Music","Market culture"], ko:["커뮤니티 중심","음악","마켓 문화"]}, accent:"#3F6FA8", motif:"market",
+    { name:"Brixton", image:"images/areas/brixton.jpg", zone:"Zone 2", lines:["Victoria line"],
+      tags:{en:["Community-first","Music","Market culture"], ko:["커뮤니티 중심","음악","마켓 문화"]}, accent:"#3F6FA8",
       profile:{energy:9,community:9,afford:6,green:5,culture:9,family:4,connectivity:8,riverside:1},
       desc:{ body:{en:"Music spilling out of every doorway and a market that never really closes — Brixton has more community energy per square mile than almost anywhere in London.",
                    ko:"집집마다 흘러나오는 음악과 사실상 쉬지 않는 마켓 — Brixton은 런던 어느 곳보다도 평방마일당 커뮤니티 에너지가 넘치는 동네입니다."},
              tags:"#communityfirst #musicinthestreets #marketculture #reallondon" } },
 
-    { name:"Dulwich", zone:"Zone 3", lines:["National Rail only — no tube"],
+    { name:"Dulwich", image:"images/areas/dulwich.jpg", zone:"Zone 3", lines:["National Rail only — no tube"],
       linesNote:{en:"National Rail only — no tube", ko:"내셔널 레일만 운행 — 튜브 없음"},
-      tags:{en:["Gallery","Woodland","Family haven"], ko:["갤러리","우드랜드","가족의 안식처"]}, accent:"#7A2E2E", motif:"gallery",
+      tags:{en:["Gallery","Woodland","Family haven"], ko:["갤러리","우드랜드","가족의 안식처"]}, accent:"#7A2E2E",
       profile:{energy:3,community:7,afford:4,green:9,culture:6,family:9,connectivity:4,riverside:1},
       desc:{ body:{en:"No tube, no rush — just galleries, woodland, and some of the best schools in the city. Dulwich is London in slow motion.",
                    ko:"튜브도 없고 서두를 일도 없이 — 갤러리와 숲, 그리고 도시 최고 수준의 학교들만 있습니다. Dulwich는 슬로모션으로 흘러가는 런던입니다."},
@@ -675,7 +675,6 @@
   // ---------- state ----------
   var state = { qIndex:0, answers:[], lang:"ko" };
   var lastArea = null;
-  var gridCanvases = [];
 
   function t(){ return STRINGS[state.lang]; }
 
@@ -713,19 +712,19 @@
   function buildAreaGrid(){
     var wrap = document.getElementById("area-grid");
     wrap.innerHTML = "";
-    gridCanvases = [];
     AREAS.forEach(function(area){
       var tile = document.createElement("div");
       tile.className = "area-tile";
-      var canvas = document.createElement("canvas");
-      tile.appendChild(canvas);
+      var img = document.createElement("img");
+      img.src = area.image;
+      img.alt = "";
+      img.loading = "lazy";
+      tile.appendChild(img);
       var label = document.createElement("span");
       label.textContent = area.name;
       tile.appendChild(label);
       wrap.appendChild(tile);
-      gridCanvases.push({ canvas:canvas, area:area });
     });
-    gridCanvases.forEach(function(g){ drawMotifOnCanvas(g.canvas, g.area); });
   }
 
   // ---------- quiz ----------
@@ -822,167 +821,8 @@
     document.getElementById("save-btn").textContent = s.saveBtn;
     document.getElementById("save-status").textContent = "";
 
-    drawMotif(area);
+    document.getElementById("r-image").src = area.image;
   }
-
-  function drawMotifOnCanvas(canvas, area){
-    var rect = canvas.getBoundingClientRect();
-    var w = rect.width || canvas.clientWidth || 1;
-    var h = rect.height || canvas.clientHeight || 1;
-    var dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.max(1, Math.round(w*dpr));
-    canvas.height = Math.max(1, Math.round(h*dpr));
-    var ctx = canvas.getContext("2d");
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.clearRect(0,0,w,h);
-    ctx.strokeStyle = area.accent;
-    ctx.fillStyle = area.accent;
-    ctx.lineWidth = 1.6;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    var fn = MOTIFS[area.motif];
-    if (fn) fn(ctx, w, h);
-  }
-
-  function drawMotif(area){
-    drawMotifOnCanvas(document.getElementById("r-canvas"), area);
-  }
-
-  function ln(ctx,x1,y1,x2,y2){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }
-  function circ(ctx,x,y,r){ ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke(); }
-
-  var MOTIFS = {
-    skyline: function(ctx,w,h){
-      var base = h*0.78;
-      ctx.save(); ctx.globalAlpha = 0.5; ln(ctx,0,base,w,base); ctx.restore();
-      var towers = [[0.14,0.07,0.34],[0.25,0.09,0.5],[0.38,0.06,0.28],[0.48,0.1,0.58],[0.63,0.07,0.4],[0.75,0.08,0.46]];
-      towers.forEach(function(t){
-        var x=t[0]*w, tw=t[1]*w, th=t[2]*h;
-        ctx.strokeRect(x, base-th, tw, th);
-        ctx.save(); ctx.globalAlpha=0.22; ln(ctx, x+tw/2, base, x+tw/2, base+th*0.22); ctx.restore();
-      });
-    },
-    streetart: function(ctx,w,h){
-      ctx.save(); ctx.globalAlpha=0.45;
-      [[0.1,0.15,0.4,0.1,0.25,0.55],[0.5,0.1,0.85,0.2,0.6,0.5],[0.15,0.6,0.45,0.85,0.08,0.82]].forEach(function(p){
-        ctx.beginPath(); ctx.moveTo(p[0]*w,p[1]*h); ctx.lineTo(p[2]*w,p[3]*h); ctx.lineTo(p[4]*w,p[5]*h); ctx.closePath(); ctx.fill();
-      });
-      ctx.restore();
-      for (var r=0;r<3;r++) for (var c=0;c<3;c++) ctx.strokeRect(w*0.68+c*w*0.07, h*0.1+r*h*0.07, w*0.05, h*0.05);
-    },
-    bandstand: function(ctx,w,h){
-      var base=h*0.78, cx=w*0.5, cy=h*0.52, r=w*0.15;
-      ln(ctx,0,base,w,base);
-      ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,2*Math.PI); ctx.stroke();
-      ln(ctx,cx-r,cy,cx-r,base); ln(ctx,cx+r,cy,cx+r,base); ln(ctx,cx-r,cy,cx+r,cy);
-      var trees=[0.1,0.2,0.82,0.92];
-      trees.forEach(function(xf){
-        var x=xf*w, cry=base-h*0.14;
-        ctx.beginPath(); ctx.arc(x,cry,w*0.03,0,Math.PI*2); ctx.stroke();
-        ln(ctx,x,cry+w*0.03,x,base);
-      });
-    },
-    bridge: function(ctx,w,h){
-      var base=h*0.72, deck=h*0.58, cx=w*0.5, r=w*0.4;
-      ln(ctx,0,base,w,base);
-      ctx.beginPath(); ctx.arc(cx,base,r,Math.PI,2*Math.PI); ctx.stroke();
-      ln(ctx,cx-r,deck,cx+r,deck);
-      for (var i=-3;i<=3;i++){
-        var x=cx+i*r/4;
-        var dy=base-Math.sqrt(Math.max(r*r-Math.pow(x-cx,2),0));
-        ln(ctx,x,dy,x,deck);
-      }
-    },
-    village: function(ctx,w,h){
-      var base=h*0.78;
-      ln(ctx,0,base,w,base);
-      [0.12,0.4,0.68].forEach(function(xf){
-        var x=xf*w, bw=w*0.18, bh=h*0.22;
-        ctx.strokeRect(x,base-bh,bw,bh);
-        ctx.beginPath(); ctx.moveTo(x,base-bh); ctx.lineTo(x+bw/2,base-bh-h*0.12); ctx.lineTo(x+bw,base-bh); ctx.stroke();
-      });
-      var nx=w*0.72, ny=h*0.1, nw=w*0.22, nh=h*0.2;
-      ctx.strokeRect(nx,ny,nw,nh);
-      ln(ctx,nx+nw/2,ny,nx+nw/2,ny+nh); ln(ctx,nx,ny+nh/2,nx+nw,ny+nh/2);
-      ctx.beginPath(); ctx.arc(nx+nw*0.75,ny+nh*0.7,w*0.012,0,Math.PI*2); ctx.fill();
-    },
-    avenue: function(ctx,w,h){
-      var base=h*0.8, vp=[w*0.5,h*0.15];
-      ln(ctx,0,base,vp[0],vp[1]); ln(ctx,w,base,vp[0],vp[1]);
-      for (var i=0;i<6;i++){
-        var x=w*0.08+i*(w*0.84/5), cry=base-h*0.16;
-        ctx.beginPath(); ctx.arc(x,cry,w*0.028,0,Math.PI*2); ctx.stroke();
-        ln(ctx,x,cry+w*0.028,x,base);
-      }
-    },
-    deerpark: function(ctx,w,h){
-      var base=h*0.74;
-      for (var i=0;i<4;i++){ var x=i/3*w; ctx.beginPath(); ctx.moveTo(x,base); ctx.quadraticCurveTo(x+w*0.08,base-h*0.03,x+w*0.16,base); ctx.stroke(); }
-      [[0.25,0.4],[0.6,0.42]].forEach(function(p){
-        var x=p[0]*w, y=p[1]*h;
-        ln(ctx,x,y,x-w*0.03,y-h*0.08); ln(ctx,x,y,x+w*0.02,y-h*0.09); ln(ctx,x,y,x,y+h*0.1);
-      });
-      for (var j=0;j<5;j++) ln(ctx, j*w*0.06, h*0.12, j*w*0.06+w*0.03, h*0.08);
-    },
-    observatory: function(ctx,w,h){
-      var base=h*0.78;
-      ln(ctx,0,base,w,base);
-      ctx.beginPath(); ctx.moveTo(w*0.1,base); ctx.quadraticCurveTo(w*0.3,base-h*0.22,w*0.45,base-h*0.02); ctx.stroke();
-      ctx.beginPath(); ctx.arc(w*0.3,base-h*0.24,w*0.08,Math.PI,2*Math.PI); ctx.stroke();
-      var sx=w*0.68, sy=base-h*0.05;
-      ctx.strokeRect(sx,sy,w*0.2,h*0.06);
-      ln(ctx,sx+w*0.1,sy,sx+w*0.1,sy-h*0.18);
-      ctx.beginPath(); ctx.moveTo(sx+w*0.1,sy-h*0.18); ctx.lineTo(sx+w*0.18,sy-h*0.06); ctx.lineTo(sx+w*0.1,sy-h*0.06); ctx.closePath(); ctx.stroke();
-    },
-    terrace: function(ctx,w,h){
-      var base=h*0.82;
-      ln(ctx,0,base,w,base);
-      for (var i=0;i<4;i++){
-        var x=w*0.06+i*w*0.23, bw=w*0.18, bh=h*0.5;
-        ctx.strokeRect(x,base-bh,bw,bh);
-        ctx.beginPath(); ctx.moveTo(x-w*0.01,base-bh); ctx.lineTo(x+bw/2,base-bh-h*0.08); ctx.lineTo(x+bw+w*0.01,base-bh); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x+bw/2,base-h*0.06,w*0.02,Math.PI,2*Math.PI); ctx.stroke();
-      }
-    },
-    pastelrow: function(ctx,w,h){
-      var base=h*0.82;
-      ln(ctx,0,base,w,base);
-      var hts=[0.42,0.5,0.46,0.38];
-      for (var i=0;i<4;i++){
-        var x=w*0.05+i*w*0.24, bw=w*0.2, bh=hts[i]*h;
-        ctx.strokeRect(x,base-bh,bw,bh);
-        ctx.strokeRect(x+bw*0.25,base-bh*0.7,bw*0.5,bh*0.3);
-        ctx.beginPath(); ctx.arc(x+bw/2,base-bh+h*0.02,w*0.018,0,Math.PI,true); ctx.stroke();
-      }
-    },
-    market: function(ctx,w,h){
-      var base=h*0.74;
-      ln(ctx,0,base,w,base);
-      for (var i=0;i<3;i++){
-        var x=w*0.1+i*w*0.3, tw=w*0.22, th=h*0.2;
-        ctx.beginPath(); ctx.moveTo(x,base-th*0.4); ctx.lineTo(x+tw/2,base-th); ctx.lineTo(x+tw,base-th*0.4); ctx.stroke();
-        ctx.strokeRect(x+tw*0.15,base-th*0.4,tw*0.7,th*0.4);
-      }
-      ctx.beginPath();
-      for (var sx=0; sx<=w; sx+=w*0.04){
-        var sy = base + h*0.08 + Math.sin(sx*0.05)*h*0.025;
-        if (sx===0) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);
-      }
-      ctx.stroke();
-    },
-    gallery: function(ctx,w,h){
-      var base=h*0.8;
-      ln(ctx,0,base,w,base);
-      var gx=w*0.08, gw=w*0.46, gh=h*0.3;
-      ctx.strokeRect(gx,base-gh,gw,gh);
-      ctx.beginPath(); ctx.moveTo(gx-w*0.02,base-gh); ctx.lineTo(gx+gw/2,base-gh-h*0.1); ctx.lineTo(gx+gw+w*0.02,base-gh); ctx.stroke();
-      for (var i=1;i<4;i++){ var cx=gx+gw*i/4; ln(ctx,cx,base-gh*0.1,cx,base); }
-      [[0.72,0.08],[0.82,0.05],[0.9,0.09]].forEach(function(p){
-        circ(ctx, p[0]*w, base-h*0.22-p[1]*h, w*0.05);
-        ln(ctx, p[0]*w, base-h*0.17, p[0]*w, base);
-      });
-    }
-  };
 
   // ---------- shareable result image ----------
   function hexToRgba(hex, alpha){
@@ -1047,7 +887,33 @@
     return curY + chipH/2;
   }
 
-  function buildResultCanvas(area, lang){
+  function loadImage(src){
+    return new Promise(function(resolve, reject){
+      var img = new Image();
+      img.onload = function(){ resolve(img); };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function drawImageCover(ctx, img, x, y, w, h){
+    var imgRatio = img.width / img.height, boxRatio = w / h;
+    var sx, sy, sw, sh;
+    if (imgRatio > boxRatio){
+      sh = img.height;
+      sw = sh * boxRatio;
+      sx = (img.width - sw) / 2;
+      sy = 0;
+    } else {
+      sw = img.width;
+      sh = sw / boxRatio;
+      sx = 0;
+      sy = (img.height - sh) / 2;
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  }
+
+  function buildResultCanvas(area, lang, areaImg){
     var W = 1080, H = 1500, motifH = 520, marginX = 72, contentW = W - marginX*2;
     var canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
@@ -1059,15 +925,7 @@
     ctx.fillStyle = hexToRgba(area.accent, 0.22);
     ctx.fillRect(0, 0, W, motifH);
 
-    ctx.save();
-    ctx.strokeStyle = area.accent;
-    ctx.fillStyle = area.accent;
-    ctx.lineWidth = 3;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    var motifFn = MOTIFS[area.motif];
-    if (motifFn) motifFn(ctx, W, motifH);
-    ctx.restore();
+    if (areaImg) drawImageCover(ctx, areaImg, 0, 0, W, motifH);
 
     ctx.strokeStyle = hexToRgba(area.accent, 0.35);
     ctx.lineWidth = 2;
@@ -1159,7 +1017,8 @@
         } catch (fontErr) { /* best effort — draw with whatever is ready */ }
       }
 
-      var canvas = buildResultCanvas(lastArea, state.lang);
+      var areaImg = await loadImage(lastArea.image);
+      var canvas = buildResultCanvas(lastArea, state.lang, areaImg);
       var blob = await new Promise(function(resolve){
         canvas.toBlob(function(b){ resolve(b); }, "image/jpeg", 0.92);
       });
@@ -1178,15 +1037,6 @@
   }
 
   document.getElementById("save-btn").addEventListener("click", handleSaveImage);
-
-  var resizeTimer = null;
-  window.addEventListener("resize", function(){
-    window.clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(function(){
-      if (lastArea) drawMotif(lastArea);
-      gridCanvases.forEach(function(g){ drawMotifOnCanvas(g.canvas, g.area); });
-    }, 120);
-  });
 
   // ---------- language ----------
   function applyLanguage(){
