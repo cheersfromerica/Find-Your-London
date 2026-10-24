@@ -2,7 +2,7 @@
 
 A ten-question taste quiz that matches you to one of twelve popular London neighbourhoods — vibe, budget, commute, and community, not postcode trivia. Available in English and Korean.
 
-**Live site:** https://iriconic.github.io/Find-Your-London/
+**Live site:** https://cheersfromerica.github.io/Find-Your-London/
 
 ## Pages
 
